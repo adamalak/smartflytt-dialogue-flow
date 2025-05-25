@@ -44,7 +44,7 @@ export const useChatbotState = () => {
     }));
   }, []);
 
-  const setSubmissionType = useCallback((type: 'offert' | 'bokning') => {
+  const setSubmissionType = useCallback((type: 'offert' | 'kontorsflytt' | 'volymuppskattning') => {
     setState(prev => ({
       ...prev,
       submissionType: type

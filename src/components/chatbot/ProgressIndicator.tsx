@@ -13,7 +13,8 @@ const stepOrder: FlowStep[] = [
   'date',
   'fromAddress',
   'toAddress',
-  'size',
+  'rooms',
+  'volume',
   'elevator',
   'contact',
   'gdpr',
@@ -58,8 +59,10 @@ const getStepDescription = (step: FlowStep): string => {
       return 'Från-adress';
     case 'toAddress':
       return 'Till-adress';
-    case 'size':
-      return 'Bohagsstorlek';
+    case 'rooms':
+      return 'Antal rum';
+    case 'volume':
+      return 'Volymuppskattning';
     case 'elevator':
       return 'Hiss';
     case 'contact':

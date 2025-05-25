@@ -1,3 +1,4 @@
+
 import sgMail from '@sendgrid/mail';
 import { ChatbotSubmission } from '../types/chatbot';
 import { config, validateConfig } from '../utils/config';
@@ -58,7 +59,8 @@ class EmailService {
       <h3>Flyttuppgifter</h3>
       <p><strong>Typ av flytt:</strong> ${data.moveType}${data.moveTypeOther ? ` (${data.moveTypeOther})` : ''}</p>
       <p><strong>Flyttdatum:</strong> ${data.date}</p>
-      <p><strong>Bohagsstorlek:</strong> ${data.size}${data.sizeOther ? ` (${data.sizeOther})` : ''}</p>
+      <p><strong>Antal rum:</strong> ${data.rooms}${data.roomsOther ? ` (${data.roomsOther})` : ''}</p>
+      <p><strong>Volym:</strong> ${data.volume ? `${data.volume} m³` : 'Ej angiven'}</p>
       <p><strong>Hiss:</strong> ${data.elevator}</p>
       
       <h3>Adresser</h3>
