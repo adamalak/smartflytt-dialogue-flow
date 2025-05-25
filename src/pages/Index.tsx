@@ -1,5 +1,6 @@
 
 import { ChatbotContainer } from "@/components/chatbot/ChatbotContainer";
+import { ConfigStatus } from "@/components/ConfigStatus";
 
 const Index = () => {
   return (
@@ -14,7 +15,10 @@ const Index = () => {
           </p>
         </div>
         
-        <ChatbotContainer />
+        <div className="w-full max-w-2xl mx-auto">
+          <ConfigStatus />
+          <ChatbotContainer />
+        </div>
         
         <div className="text-center mt-8 text-sm text-gray-500">
           <p>Har du tekniska problem? Kontakta oss på info@smartflytt.se</p>

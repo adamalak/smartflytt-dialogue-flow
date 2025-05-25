@@ -1,6 +1,7 @@
 
 import { ChatbotState } from '@/types/chatbot';
 import { emailService } from '@/services/emailService';
+import { getConfigStatus } from '@/utils/config';
 import { v4 as uuidv4 } from 'uuid';
 
 interface SubmissionContext {
@@ -16,6 +17,14 @@ export const submitForm = async (context: SubmissionContext) => {
   try {
     addMessage('Tack! Jag skickar nu ditt ärende...', 'bot');
     setLoading(true);
+
+    const configStatus = getConfigStatus();
+    
+    if (!configStatus.emailEnabled) {
+      addMessage('E-postfunktionen är inte konfigurerad. Kontakta oss direkt på info@smartflytt.se eller 08-12345678 med dina uppgifter.', 'bot');
+      console.error('Email configuration errors:', configStatus.errors);
+      return;
+    }
 
     const submission = {
       id: uuidv4(),
@@ -40,5 +49,7 @@ export const submitForm = async (context: SubmissionContext) => {
   } catch (error) {
     console.error('Submission error:', error);
     addMessage('Ett tekniskt fel uppstod. Kontakta oss direkt på info@smartflytt.se eller 08-12345678', 'bot');
+  } finally {
+    setLoading(false);
   }
 };

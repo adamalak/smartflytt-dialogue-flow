@@ -1,6 +1,6 @@
-
 import sgMail from '@sendgrid/mail';
 import { ChatbotSubmission } from '../types/chatbot';
+import { config, validateConfig } from '../utils/config';
 
 class EmailService {
   private isInitialized = false;
@@ -8,13 +8,13 @@ class EmailService {
   private initialize() {
     if (this.isInitialized) return;
     
-    const apiKey = import.meta.env.VITE_SENDGRID_API_KEY;
-    if (!apiKey) {
-      console.error('SENDGRID_API_KEY environment variable not set');
+    const validation = validateConfig();
+    if (!validation.isValid) {
+      console.error('Email service configuration errors:', validation.errors);
       return;
     }
     
-    sgMail.setApiKey(apiKey);
+    sgMail.setApiKey(config.sendgridApiKey!);
     this.isInitialized = true;
   }
 
@@ -23,22 +23,20 @@ class EmailService {
       this.initialize();
       
       if (!this.isInitialized) {
-        throw new Error('SendGrid not properly initialized');
+        throw new Error('SendGrid not properly initialized - check environment variables');
       }
-
-      const recipientEmail = import.meta.env.VITE_ADMIN_EMAIL_RECIPIENT || 'info@smartflytt.se';
       
       const emailContent = this.formatSubmissionEmail(submission);
       
       const msg = {
-        to: recipientEmail,
+        to: config.adminEmailRecipient,
         from: 'noreply@smartflytt.se',
         subject: `Ny ${submission.type} från chattbot - ${submission.data.contact.name}`,
         html: emailContent
       };
 
       await sgMail.send(msg);
-      console.log('Email sent successfully');
+      console.log('Email sent successfully to:', config.adminEmailRecipient);
       return true;
     } catch (error) {
       console.error('Error sending email:', error);
