@@ -43,7 +43,7 @@ export const ChatbotPopup: React.FC = () => {
             </div>
             
             <div className="flex-1 min-h-0">
-              <ChatbotContainer onClose={togglePopup} />
+              <ChatbotContainer />
             </div>
           </Card>
         </div>
