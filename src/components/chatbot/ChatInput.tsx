@@ -39,13 +39,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         return 'Skriv ditt meddelande...';
       case 'moveType':
         return 'Välj typ av flytt...';
-      case 'moveDate':
+      case 'date':
         return 'Ange flyttdatum (ÅÅÅÅ-MM-DD)...';
       case 'fromAddress':
         return 'Ange från-adress...';
       case 'toAddress':
         return 'Ange till-adress...';
-      case 'houseSize':
+      case 'size':
         return 'Beskriv bohagsstorlek...';
       case 'elevator':
         return 'Finns det hiss?';
