@@ -48,6 +48,7 @@ export interface MoveQuoteData {
   elevator: 'båda' | 'från' | 'till' | 'ingen';
   contact: ContactInfo;
   gdprConsent: boolean;
+  additionalInfo?: string;
   distanceData?: DistanceData;
   priceCalculation?: PriceCalculation;
 }
@@ -70,9 +71,10 @@ export type FlowStep =
   | 'volume'
   | 'volumeCoordinator'
   | 'elevator'
+  | 'priceCalculation'
   | 'contact'
   | 'gdpr'
-  | 'priceCalculation'
+  | 'additionalInfo'
   | 'summary'
   | 'submitted'
   | 'faq'

@@ -20,6 +20,11 @@ export const CHATBOT_CONSTANTS = {
   GDPR_TEXT: 'Godkänner du att vi behandlar dina personuppgifter enligt vår integritetspolicy för att kunna ge dig en preliminär offert?',
   GDPR_LINK: 'https://smartflytt.se/integritetspolicy',
   
+  BASE_COORDINATES: {
+    latitude: 57.708870, // Göteborg centrum
+    longitude: 11.974560
+  },
+  
   QUICK_REPLIES: {
     MOVE_TYPES: [
       { label: 'Bostad', value: 'bostad' },
