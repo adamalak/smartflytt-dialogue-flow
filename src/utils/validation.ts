@@ -22,6 +22,8 @@ export const validateInput = (type: string, value: string): ValidationResult => 
       return validateName(trimmedValue);
     case 'city':
       return validateCity(trimmedValue);
+    case 'volume':
+      return validateVolume(trimmedValue);
     default:
       return { isValid: true };
   }
@@ -107,6 +109,19 @@ const validateCity = (value: string): ValidationResult => {
     return {
       isValid: false,
       error: CHATBOT_CONSTANTS.VALIDATION_MESSAGES.MIN_CITY_LENGTH
+    };
+  }
+
+  return { isValid: true };
+};
+
+const validateVolume = (value: string): ValidationResult => {
+  const volume = parseFloat(value);
+  
+  if (isNaN(volume) || volume <= 0) {
+    return {
+      isValid: false,
+      error: CHATBOT_CONSTANTS.VALIDATION_MESSAGES.INVALID_VOLUME
     };
   }
 

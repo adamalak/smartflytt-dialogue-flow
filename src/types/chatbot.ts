@@ -19,24 +19,45 @@ export interface ContactInfo {
   email: string;
 }
 
+export interface DistanceData {
+  movingDistance: number; // D - körsträcka mellan från/till
+  baseToStartDistance: number; // D_start_bas
+  baseToEndDistance: number; // D_slut_bas
+}
+
+export interface PriceCalculation {
+  startFee: number;
+  elevatorFee: number;
+  volumeCost: number;
+  distanceCost: number;
+  remoteStartSurcharge: number;
+  longDistanceSurcharge: number;
+  totalPrice: number;
+}
+
 export interface MoveQuoteData {
   moveType: 'bostad' | 'kontor' | 'annat';
   moveTypeOther?: string;
   date: string;
   from: Address;
   to: Address;
-  size: '1 rok' | '2 rok' | 'villa' | 'annat';
-  sizeOther?: string;
-  elevator: 'ja' | 'nej' | 'båda' | 'ingen';
+  rooms: '1 rok' | '2 rok' | '3 rok' | 'villa' | 'annat';
+  roomsOther?: string;
+  volume?: number; // m³
+  wantsVolumeCoordinator?: boolean;
+  elevator: 'båda' | 'från' | 'till' | 'ingen';
   contact: ContactInfo;
   gdprConsent: boolean;
+  distanceData?: DistanceData;
+  priceCalculation?: PriceCalculation;
 }
 
 export interface ChatbotSubmission {
   id: string;
   timestamp: string;
-  type: 'offert' | 'bokning';
+  type: 'offert' | 'kontorsflytt' | 'volymuppskattning';
   data: MoveQuoteData;
+  chatTranscript: ChatMessage[];
 }
 
 export type FlowStep = 
@@ -45,10 +66,13 @@ export type FlowStep =
   | 'date'
   | 'fromAddress'
   | 'toAddress'
-  | 'size'
+  | 'rooms'
+  | 'volume'
+  | 'volumeCoordinator'
   | 'elevator'
   | 'contact'
   | 'gdpr'
+  | 'priceCalculation'
   | 'summary'
   | 'submitted'
   | 'faq'
@@ -58,7 +82,7 @@ export interface ChatbotState {
   currentStep: FlowStep;
   messages: ChatMessage[];
   formData: Partial<MoveQuoteData>;
-  submissionType: 'offert' | 'bokning' | null;
+  submissionType: 'offert' | 'kontorsflytt' | 'volymuppskattning' | null;
   isLoading: boolean;
   error: string | null;
 }

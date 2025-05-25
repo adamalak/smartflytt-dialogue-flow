@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
 import { FlowStep } from '@/types/chatbot';
 import { CHATBOT_CONSTANTS } from '@/data/constants';
 
@@ -45,12 +45,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         return 'T.ex. "Storgatan 1, 12345 Stockholm"...';
       case 'toAddress':
         return 'T.ex. "Nygatan 5, 54321 Göteborg"...';
-      case 'size':
+      case 'rooms':
         return 'T.ex. "1 rok", "2 rok", "villa"...';
+      case 'volume':
+        return 'Ange antal kubikmeter (t.ex. 25)...';
+      case 'volumeCoordinator':
+        return 'Skriv "ja" eller "nej"...';
       case 'elevator':
-        return 'T.ex. "ja", "nej", "båda"...';
+        return 'T.ex. "ja båda", "nej ingen"...';
       case 'contact':
-        return 'T.ex. "Anna Svensson, 0701234567, anna@exempel.se"...';
+        return 'T.ex. "Anna Svensson, anna@exempel.se"...';
       case 'gdpr':
         return 'Skriv "ja" för att godkänna...';
       default:
@@ -79,10 +83,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       );
     }
 
-    if (currentStep === 'size') {
+    if (currentStep === 'rooms') {
       return (
         <div className="flex flex-wrap gap-2 mb-2">
-          {CHATBOT_CONSTANTS.QUICK_REPLIES.SIZE_OPTIONS.map((reply) => (
+          {CHATBOT_CONSTANTS.QUICK_REPLIES.ROOM_OPTIONS.map((reply) => (
             <Button
               key={reply.value}
               variant="outline"
@@ -117,6 +121,25 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       );
     }
 
+    if (currentStep === 'volumeCoordinator') {
+      return (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {CHATBOT_CONSTANTS.QUICK_REPLIES.VOLUME_COORDINATOR.map((reply) => (
+            <Button
+              key={reply.value}
+              variant="outline"
+              size="sm"
+              onClick={() => onSendMessage(reply.label)}
+              disabled={disabled}
+              className="text-xs"
+            >
+              {reply.label}
+            </Button>
+          ))}
+        </div>
+      );
+    }
+
     return null;
   };
 
@@ -136,9 +159,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           onClick={handleSend}
           disabled={disabled || !inputValue.trim()}
           size="icon"
-          className="shrink-0"
+          className="shrink-0 bg-green-500 hover:bg-green-600"
         >
-          <Send className="w-4 h-4" />
+          {disabled ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Send className="w-4 h-4" />
+          )}
         </Button>
       </div>
     </div>

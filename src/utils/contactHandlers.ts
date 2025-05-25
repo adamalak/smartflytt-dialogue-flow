@@ -8,22 +8,27 @@ export const handleContactStep = async (message: string, context: StepHandlerCon
   const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
   const phoneMatch = message.match(/(\+46|0)[\s-]?7[\d\s-]{8,}/);
   
-  if (!emailMatch || !phoneMatch) {
-    addMessage('Jag behöver både telefonnummer och e-post. Ange: Namn, 07XXXXXXXX, namn@exempel.se', 'bot');
+  // For volume coordinator requests, phone is required
+  if (!emailMatch) {
+    addMessage('Jag behöver din e-postadress. Ange: Namn, e-post (och telefon om du vill)', 'bot');
     return;
   }
 
   const email = emailMatch[0];
-  const phone = phoneMatch[0].replace(/[\s-]/g, '');
-  const name = message.replace(emailMatch[0], '').replace(phoneMatch[0], '').replace(/[,]/g, '').trim();
+  const phone = phoneMatch ? phoneMatch[0].replace(/[\s-]/g, '') : '';
+  let name = message.replace(emailMatch[0], '');
+  if (phoneMatch) {
+    name = name.replace(phoneMatch[0], '');
+  }
+  name = name.replace(/[,]/g, '').trim();
 
   if (!name) {
-    addMessage('Jag behöver ditt namn också. Ange: Namn, telefon, e-post', 'bot');
+    addMessage('Jag behöver ditt namn också. Ange: Namn, e-post (och telefon om du vill)', 'bot');
     return;
   }
 
   updateFormData({ contact: { name, phone, email } });
-  addMessage(`Kontakt registrerad: ${name}, ${phone}, ${email}`, 'bot');
+  addMessage(`Kontakt registrerad: ${name}, ${email}${phone ? `, ${phone}` : ''}`, 'bot');
   
   setTimeout(() => {
     addMessage(CHATBOT_CONSTANTS.GDPR_TEXT, 'bot');

@@ -6,10 +6,14 @@ import {
   handleDateStep, 
   handleFaqStep, 
   handleServicesStep,
+  handleRoomsStep,
+  handleVolumeStep,
+  handleVolumeCoordinatorStep,
   StepHandlerContext 
 } from './stepHandlers';
-import { handleFromAddressStep, handleToAddressStep, handleSizeStep, handleElevatorStep } from './addressHandlers';
+import { handleFromAddressStep, handleToAddressStep, handleElevatorStep } from './addressHandlers';
 import { handleContactStep, handleGdprStep } from './contactHandlers';
+import { handlePriceCalculationStep } from './priceCalculationHandler';
 import { submitForm } from './formSubmission';
 
 interface MessageProcessorProps {
@@ -17,7 +21,7 @@ interface MessageProcessorProps {
   state: ChatbotState;
   addMessage: (content: string, type: 'bot' | 'user', isQuickReply?: boolean) => void;
   setCurrentStep: (step: FlowStep) => void;
-  setSubmissionType: (type: 'offert' | 'bokning') => void;
+  setSubmissionType: (type: 'offert' | 'kontorsflytt' | 'volymuppskattning') => void;
   updateFormData: (data: any) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -72,11 +76,20 @@ export const processUserMessage = async (props: MessageProcessorProps) => {
       case 'toAddress':
         await handleToAddressStep(message, context);
         break;
-      case 'size':
-        await handleSizeStep(message, context);
+      case 'rooms':
+        await handleRoomsStep(message, context);
+        break;
+      case 'volume':
+        await handleVolumeStep(message, context);
+        break;
+      case 'volumeCoordinator':
+        await handleVolumeCoordinatorStep(message, context);
         break;
       case 'elevator':
         await handleElevatorStep(message, context);
+        break;
+      case 'priceCalculation':
+        await handlePriceCalculationStep(state.formData, context);
         break;
       case 'contact':
         await handleContactStep(message, context);
@@ -96,7 +109,7 @@ export const processUserMessage = async (props: MessageProcessorProps) => {
   } catch (error) {
     console.error('Error processing message:', error);
     setError('Ett fel uppstod. Försök igen.');
-    addMessage('Ett tekniskt fel uppstod. Försök igen eller kontakta oss direkt.', 'bot');
+    addMessage('Ett tekniskt fel uppstod. Försök igen eller kontakta oss direkt på smartflyttlogistik@gmail.com.', 'bot');
   }
 
   setLoading(false);

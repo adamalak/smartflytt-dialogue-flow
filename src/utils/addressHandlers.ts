@@ -50,34 +50,8 @@ export const handleToAddressStep = async (message: string, context: StepHandlerC
   addMessage(`Till-adress registrerad: ${street}, ${postal} ${city}`, 'bot');
   
   setTimeout(() => {
-    addMessage('Hur stor är din bostad/ditt bohag?', 'bot');
-    setCurrentStep('size');
-  }, 1000);
-};
-
-export const handleSizeStep = async (message: string, context: StepHandlerContext) => {
-  const { addMessage, setCurrentStep, updateFormData } = context;
-  const lowerMessage = message.toLowerCase();
-  let size: string;
-  let sizeOther: string | undefined;
-
-  if (lowerMessage.includes('1') && lowerMessage.includes('rok')) {
-    size = '1 rok';
-  } else if (lowerMessage.includes('2') && lowerMessage.includes('rok')) {
-    size = '2 rok';
-  } else if (lowerMessage.includes('villa') || lowerMessage.includes('hus')) {
-    size = 'villa';
-  } else {
-    size = 'annat';
-    sizeOther = message;
-  }
-
-  updateFormData({ size, sizeOther });
-  addMessage(`Bohagsstorlek: ${size === 'annat' ? message : size}`, 'bot');
-  
-  setTimeout(() => {
-    addMessage('Finns det hiss på någon av adresserna?', 'bot');
-    setCurrentStep('elevator');
+    addMessage('Hur många rum är det som ska flyttas?', 'bot');
+    setCurrentStep('rooms');
   }, 1000);
 };
 
@@ -88,8 +62,10 @@ export const handleElevatorStep = async (message: string, context: StepHandlerCo
 
   if (lowerMessage.includes('båda') || (lowerMessage.includes('ja') && lowerMessage.includes('båda'))) {
     elevator = 'båda';
-  } else if (lowerMessage.includes('ja') && !lowerMessage.includes('nej')) {
-    elevator = 'ja';
+  } else if (lowerMessage.includes('från') || (lowerMessage.includes('ja') && lowerMessage.includes('från'))) {
+    elevator = 'från';
+  } else if (lowerMessage.includes('till') || (lowerMessage.includes('ja') && lowerMessage.includes('till'))) {
+    elevator = 'till';
   } else {
     elevator = 'ingen';
   }
@@ -98,7 +74,7 @@ export const handleElevatorStep = async (message: string, context: StepHandlerCo
   addMessage(`Hiss: ${elevator}`, 'bot');
   
   setTimeout(() => {
-    addMessage('Slutligen behöver jag dina kontaktuppgifter. Ange namn, telefon och e-post:', 'bot');
-    setCurrentStep('contact');
+    addMessage('Nu beräknar jag körsträckor och preliminär kostnad...', 'bot');
+    setCurrentStep('priceCalculation');
   }, 1000);
 };
