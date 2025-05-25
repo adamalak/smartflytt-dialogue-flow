@@ -38,19 +38,21 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       case 'welcome':
         return 'Skriv ditt meddelande...';
       case 'moveType':
-        return 'Välj typ av flytt...';
+        return 'T.ex. "bostad", "kontor" eller "annat"...';
       case 'date':
         return 'Ange flyttdatum (ÅÅÅÅ-MM-DD)...';
       case 'fromAddress':
-        return 'Ange från-adress...';
+        return 'T.ex. "Storgatan 1, 12345 Stockholm"...';
       case 'toAddress':
-        return 'Ange till-adress...';
+        return 'T.ex. "Nygatan 5, 54321 Göteborg"...';
       case 'size':
-        return 'Beskriv bohagsstorlek...';
+        return 'T.ex. "1 rok", "2 rok", "villa"...';
       case 'elevator':
-        return 'Finns det hiss?';
+        return 'T.ex. "ja", "nej", "båda"...';
       case 'contact':
-        return 'Ange kontaktuppgifter...';
+        return 'T.ex. "Anna Svensson, 0701234567, anna@exempel.se"...';
+      case 'gdpr':
+        return 'Skriv "ja" för att godkänna...';
       default:
         return 'Skriv ditt meddelande...';
     }
@@ -58,16 +60,17 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   // Show quick reply buttons for certain steps
   const showQuickReplies = () => {
-    if (currentStep === 'welcome') {
+    if (currentStep === 'moveType') {
       return (
         <div className="flex flex-wrap gap-2 mb-2">
-          {CHATBOT_CONSTANTS.QUICK_REPLIES.MAIN_MENU.map((reply) => (
+          {CHATBOT_CONSTANTS.QUICK_REPLIES.MOVE_TYPES.map((reply) => (
             <Button
               key={reply.value}
               variant="outline"
               size="sm"
               onClick={() => onSendMessage(reply.label)}
               disabled={disabled}
+              className="text-xs"
             >
               {reply.label}
             </Button>
@@ -75,11 +78,50 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         </div>
       );
     }
+
+    if (currentStep === 'size') {
+      return (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {CHATBOT_CONSTANTS.QUICK_REPLIES.SIZE_OPTIONS.map((reply) => (
+            <Button
+              key={reply.value}
+              variant="outline"
+              size="sm"
+              onClick={() => onSendMessage(reply.label)}
+              disabled={disabled}
+              className="text-xs"
+            >
+              {reply.label}
+            </Button>
+          ))}
+        </div>
+      );
+    }
+
+    if (currentStep === 'elevator') {
+      return (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {CHATBOT_CONSTANTS.QUICK_REPLIES.ELEVATOR_OPTIONS.map((reply) => (
+            <Button
+              key={reply.value}
+              variant="outline"
+              size="sm"
+              onClick={() => onSendMessage(reply.label)}
+              disabled={disabled}
+              className="text-xs"
+            >
+              {reply.label}
+            </Button>
+          ))}
+        </div>
+      );
+    }
+
     return null;
   };
 
   return (
-    <div className="border-t p-4">
+    <div className="border-t p-4 bg-background">
       {showQuickReplies()}
       <div className="flex gap-2">
         <Input
@@ -94,6 +136,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           onClick={handleSend}
           disabled={disabled || !inputValue.trim()}
           size="icon"
+          className="shrink-0"
         >
           <Send className="w-4 h-4" />
         </Button>
