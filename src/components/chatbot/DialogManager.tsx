@@ -8,7 +8,7 @@ interface DialogManagerProps {
   state: ChatbotState;
   addMessage: (content: string, type: 'bot' | 'user', isQuickReply?: boolean) => void;
   setCurrentStep: (step: FlowStep) => void;
-  setSubmissionType: (type: 'offert' | 'bokning') => void;
+  setSubmissionType: (type: 'offert' | 'kontorsflytt' | 'volymuppskattning') => void;
   updateFormData: (data: any) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
