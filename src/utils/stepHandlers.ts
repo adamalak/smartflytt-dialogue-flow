@@ -80,7 +80,7 @@ export const handleDateStep = async (message: string, context: StepHandlerContex
   addMessage(`Perfekt! Flyttdatum: ${message}`, 'bot');
   
   setTimeout(() => {
-    addMessage('Nu behöver jag din nuvarande adress. Ange gata och nummer:', 'bot');
+    addMessage('Nu behöver jag din nuvarande adress:', 'bot');
     setCurrentStep('fromAddress');
   }, 1000);
 };
@@ -151,6 +151,23 @@ export const handleVolumeCoordinatorStep = async (message: string, context: Step
     // Stay on volume step to get manual input
     setCurrentStep('volume');
   }
+};
+
+export const handleAdditionalInfoStep = async (message: string, context: StepHandlerContext) => {
+  const { addMessage, setCurrentStep, updateFormData } = context;
+  
+  if (message.toLowerCase().includes('nej') || message.toLowerCase().includes('ingen')) {
+    updateFormData({ additionalInfo: '' });
+    addMessage('Okej, vi går vidare utan ytterligare information.', 'bot');
+  } else {
+    updateFormData({ additionalInfo: message });
+    addMessage('Tack för den ytterligare informationen!', 'bot');
+  }
+  
+  setTimeout(() => {
+    addMessage(CHATBOT_CONSTANTS.GDPR_TEXT, 'bot');
+    setCurrentStep('gdpr');
+  }, 1000);
 };
 
 export const handleFaqStep = async (message: string, context: StepHandlerContext) => {

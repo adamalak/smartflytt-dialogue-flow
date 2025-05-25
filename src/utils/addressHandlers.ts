@@ -1,53 +1,38 @@
 
 import { StepHandlerContext } from './stepHandlers';
-
-const parseAddress = (message: string) => {
-  const parts = message.split(',').map(p => p.trim());
-  let street = parts[0] || message;
-  let postal = '';
-  let city = '';
-
-  const postalMatch = message.match(/\b\d{5}\b/);
-  if (postalMatch) {
-    postal = postalMatch[0];
-    const cityMatch = message.match(/\d{5}\s+([a-öA-Ö\s]+)/);
-    if (cityMatch) {
-      city = cityMatch[1].trim();
-    }
-  }
-
-  return { street, postal, city };
-};
+import { Address } from '@/types/chatbot';
 
 export const handleFromAddressStep = async (message: string, context: StepHandlerContext) => {
+  const { addMessage, setCurrentStep } = context;
+  
+  // Show address input form - the actual address data will be handled by the AddressInput component
+  addMessage('Fyll i din nuvarande adress nedan:', 'bot');
+};
+
+export const handleFromAddressSubmission = async (address: Address, context: StepHandlerContext) => {
   const { addMessage, setCurrentStep, updateFormData } = context;
-  const { street, postal, city } = parseAddress(message);
-
-  if (!postal) {
-    addMessage('Jag behöver postnummer också. Ange hela adressen: Gata nummer, postnummer stad', 'bot');
-    return;
-  }
-
-  updateFormData({ from: { street, postal, city } });
-  addMessage(`Från-adress registrerad: ${street}, ${postal} ${city}`, 'bot');
+  
+  updateFormData({ from: address });
+  addMessage(`Från-adress registrerad: ${address.street}, ${address.postal} ${address.city}`, 'bot');
   
   setTimeout(() => {
-    addMessage('Vart ska du flytta? Ange din nya adress:', 'bot');
+    addMessage('Nu behöver jag din nya adress. Fyll i uppgifterna nedan:', 'bot');
     setCurrentStep('toAddress');
   }, 1000);
 };
 
 export const handleToAddressStep = async (message: string, context: StepHandlerContext) => {
+  const { addMessage } = context;
+  
+  // Show address input form - the actual address data will be handled by the AddressInput component
+  addMessage('Fyll i din nya adress nedan:', 'bot');
+};
+
+export const handleToAddressSubmission = async (address: Address, context: StepHandlerContext) => {
   const { addMessage, setCurrentStep, updateFormData } = context;
-  const { street, postal, city } = parseAddress(message);
-
-  if (!postal) {
-    addMessage('Jag behöver postnummer för din nya adress också. Ange: Gata nummer, postnummer stad', 'bot');
-    return;
-  }
-
-  updateFormData({ to: { street, postal, city } });
-  addMessage(`Till-adress registrerad: ${street}, ${postal} ${city}`, 'bot');
+  
+  updateFormData({ to: address });
+  addMessage(`Till-adress registrerad: ${address.street}, ${address.postal} ${address.city}`, 'bot');
   
   setTimeout(() => {
     addMessage('Hur många rum är det som ska flyttas?', 'bot');

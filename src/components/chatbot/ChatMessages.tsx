@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { ChatMessage } from '@/types/chatbot';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -10,23 +9,33 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Address } from '@/types/chatbot';
+import { handleFromAddressSubmission, handleToAddressSubmission } from '@/utils/addressHandlers';
 
 interface ChatMessagesProps {
   messages: ChatMessage[];
   isLoading: boolean;
   onQuickReply?: (message: string) => void;
+  currentStep?: string;
+  addMessage?: (content: string, type: 'bot' | 'user', isQuickReply?: boolean) => void;
+  setCurrentStep?: (step: any) => void;
+  updateFormData?: (data: any) => void;
 }
 
 export const ChatMessages: React.FC<ChatMessagesProps> = ({ 
   messages, 
   isLoading,
-  onQuickReply 
+  onQuickReply,
+  currentStep,
+  addMessage,
+  setCurrentStep,
+  updateFormData
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showAddressInput, setShowAddressInput] = useState<'from' | 'to' | null>(null);
   const [showVolumeInput, setShowVolumeInput] = useState(false);
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
+  const [showRoomsSelection, setShowRoomsSelection] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -37,26 +46,28 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
   }, [messages]);
 
   useEffect(() => {
-    const lastMessage = messages[messages.length - 1];
-    if (lastMessage?.type === 'bot') {
-      if (lastMessage.content.includes('Vilket datum vill du flytta?')) {
-        setShowDatePicker(true);
-      } else if (lastMessage.content.includes('nuvarande adress')) {
-        setShowAddressInput('from');
-      } else if (lastMessage.content.includes('nya adress')) {
-        setShowAddressInput('to');
-      } else if (lastMessage.content.includes('kubikmeter (m³)')) {
-        setShowVolumeInput(true);
-      } else if (lastMessage.content.includes('ytterligare information')) {
-        setShowAdditionalInfo(true);
-      } else {
-        setShowDatePicker(false);
-        setShowAddressInput(null);
-        setShowVolumeInput(false);
-        setShowAdditionalInfo(false);
-      }
+    // Reset all UI states first
+    setShowDatePicker(false);
+    setShowAddressInput(null);
+    setShowVolumeInput(false);
+    setShowAdditionalInfo(false);
+    setShowRoomsSelection(false);
+
+    // Show appropriate UI based on current step
+    if (currentStep === 'date') {
+      setShowDatePicker(true);
+    } else if (currentStep === 'fromAddress') {
+      setShowAddressInput('from');
+    } else if (currentStep === 'toAddress') {
+      setShowAddressInput('to');
+    } else if (currentStep === 'rooms') {
+      setShowRoomsSelection(true);
+    } else if (currentStep === 'volume') {
+      setShowVolumeInput(true);
+    } else if (currentStep === 'additionalInfo') {
+      setShowAdditionalInfo(true);
     }
-  }, [messages]);
+  }, [currentStep]);
 
   const handleQuickReply = (value: string) => {
     if (onQuickReply) {
@@ -73,10 +84,23 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
   };
 
   const handleAddressSubmit = (address: Address) => {
-    if (onQuickReply) {
-      onQuickReply(`${address.street}, ${address.postal} ${address.city}`);
-      setShowAddressInput(null);
+    if (!addMessage || !setCurrentStep || !updateFormData) return;
+
+    const context = {
+      message: '',
+      addMessage,
+      setCurrentStep,
+      setSubmissionType: () => {},
+      updateFormData
+    };
+
+    if (showAddressInput === 'from') {
+      handleFromAddressSubmission(address, context);
+    } else if (showAddressInput === 'to') {
+      handleToAddressSubmission(address, context);
     }
+    
+    setShowAddressInput(null);
   };
 
   const handleVolumeSubmit = (volume: string) => {
@@ -90,6 +114,13 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     if (onQuickReply) {
       onQuickReply(info || 'Nej, ingen ytterligare information');
       setShowAdditionalInfo(false);
+    }
+  };
+
+  const handleRoomSelection = (roomType: string) => {
+    if (onQuickReply) {
+      onQuickReply(roomType);
+      setShowRoomsSelection(false);
     }
   };
 
@@ -154,6 +185,10 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
           </div>
         )}
 
+        {showRoomsSelection && (
+          <RoomsSelection onSelect={handleRoomSelection} />
+        )}
+
         {showVolumeInput && (
           <VolumeInput onSubmit={handleVolumeSubmit} />
         )}
@@ -180,6 +215,34 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
         <div ref={messagesEndRef} />
       </div>
     </ScrollArea>
+  );
+};
+
+// Rooms Selection Component
+const RoomsSelection: React.FC<{ onSelect: (roomType: string) => void }> = ({ onSelect }) => {
+  const roomOptions = [
+    { value: '1 rok', label: '1 rum och kök' },
+    { value: '2 rok', label: '2 rum och kök' },
+    { value: '3 rok', label: '3 rum och kök' },
+    { value: 'villa', label: 'Villa/Hus' },
+    { value: 'annat', label: 'Annat' }
+  ];
+
+  return (
+    <div className="flex justify-center">
+      <div className="w-full max-w-md space-y-2">
+        {roomOptions.map((option) => (
+          <Button
+            key={option.value}
+            onClick={() => onSelect(option.value)}
+            variant="outline"
+            className="w-full border-green-200 hover:bg-green-50 text-green-700"
+          >
+            {option.label}
+          </Button>
+        ))}
+      </div>
+    </div>
   );
 };
 

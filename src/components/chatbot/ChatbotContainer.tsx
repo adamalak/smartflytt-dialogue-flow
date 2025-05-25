@@ -36,6 +36,10 @@ export const ChatbotContainer: React.FC = () => {
             messages={chatbotState.state.messages}
             isLoading={chatbotState.state.isLoading}
             onQuickReply={handleSendMessage}
+            currentStep={chatbotState.state.currentStep}
+            addMessage={chatbotState.addMessage}
+            setCurrentStep={chatbotState.setCurrentStep}
+            updateFormData={chatbotState.updateFormData}
           />
           
           <DialogManager {...chatbotState} />

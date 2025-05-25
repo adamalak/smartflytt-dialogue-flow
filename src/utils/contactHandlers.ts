@@ -31,8 +31,8 @@ export const handleContactStep = async (message: string, context: StepHandlerCon
   addMessage(`Kontakt registrerad: ${name}, ${email}${phone ? `, ${phone}` : ''}`, 'bot');
   
   setTimeout(() => {
-    addMessage(CHATBOT_CONSTANTS.GDPR_TEXT, 'bot');
-    setCurrentStep('gdpr');
+    addMessage('Slutligen, har du någon ytterligare information eller speciella önskemål för flytten?', 'bot');
+    setCurrentStep('additionalInfo');
   }, 1000);
 };
 

@@ -9,6 +9,7 @@ import {
   handleRoomsStep,
   handleVolumeStep,
   handleVolumeCoordinatorStep,
+  handleAdditionalInfoStep,
   StepHandlerContext 
 } from './stepHandlers';
 import { handleFromAddressStep, handleToAddressStep, handleElevatorStep } from './addressHandlers';
@@ -93,6 +94,9 @@ export const processUserMessage = async (props: MessageProcessorProps) => {
         break;
       case 'contact':
         await handleContactStep(message, context);
+        break;
+      case 'additionalInfo':
+        await handleAdditionalInfoStep(message, context);
         break;
       case 'gdpr':
         await handleGdprStep(message, context, () => submitForm(submissionContext));
