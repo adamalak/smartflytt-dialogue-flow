@@ -1,7 +1,6 @@
 
 import { ChatbotState } from '@/types/chatbot';
-import { emailService } from '@/services/emailService';
-import { getConfigStatus } from '@/utils/config';
+import { supabaseEmailService } from '@/services/supabaseEmailService';
 import { v4 as uuidv4 } from 'uuid';
 
 interface SubmissionContext {
@@ -18,14 +17,6 @@ export const submitForm = async (context: SubmissionContext) => {
     addMessage('Tack! Jag skickar nu ditt ärende...', 'bot');
     setLoading(true);
 
-    const configStatus = getConfigStatus();
-    
-    if (!configStatus.emailEnabled) {
-      addMessage('E-postfunktionen är inte konfigurerad. Kontakta oss direkt på info@smartflytt.se eller 08-12345678 med dina uppgifter.', 'bot');
-      console.error('Email configuration errors:', configStatus.errors);
-      return;
-    }
-
     const submission = {
       id: uuidv4(),
       timestamp: new Date().toISOString(),
@@ -33,7 +24,8 @@ export const submitForm = async (context: SubmissionContext) => {
       data: state.formData as any
     };
 
-    const success = await emailService.sendSubmission(submission);
+    console.log('Submitting form via Supabase Edge Function');
+    const success = await supabaseEmailService.sendSubmission(submission);
 
     if (success) {
       addMessage(`Perfekt! Din ${state.submissionType} har skickats. Du får svar inom 24 timmar på ${state.formData.contact?.email}. Ärendenummer: ${submission.id.slice(0, 8)}`, 'bot');
