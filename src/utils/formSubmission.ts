@@ -40,23 +40,23 @@ export const submitForm = async (context: SubmissionContext) => {
         name: state.formData.contact?.name,
         email: state.formData.contact?.email,
         phone: state.formData.contact?.phone,
-        from_address: state.formData.from,
-        to_address: state.formData.to,
+        from_address: state.formData.from ? JSON.parse(JSON.stringify(state.formData.from)) : null,
+        to_address: state.formData.to ? JSON.parse(JSON.stringify(state.formData.to)) : null,
         volume: state.formData.volume,
-        price_calculation: state.formData.priceCalculation,
+        price_calculation: state.formData.priceCalculation ? JSON.parse(JSON.stringify(state.formData.priceCalculation)) : null,
         lead_quality: leadScore.quality,
         lead_score: leadScore.score,
         status: 'new',
         submission_type: state.submissionType,
         move_date: state.formData.date,
-        distance_data: state.formData.distanceData,
+        distance_data: state.formData.distanceData ? JSON.parse(JSON.stringify(state.formData.distanceData)) : null,
         additional_info: state.formData.additionalInfo,
-        chat_transcript: state.messages
+        chat_transcript: JSON.parse(JSON.stringify(state.messages))
       };
 
       const { data: leadResult, error: leadError } = await supabase
         .from('leads')
-        .insert([leadData])
+        .insert(leadData)
         .select()
         .single();
 
