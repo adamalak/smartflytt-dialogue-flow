@@ -2,7 +2,8 @@
 import { ChatbotState } from '@/types/chatbot';
 import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuidv4 } from 'uuid';
-import { trackFormSubmission, trackConversion, trackErrorEvent } from '@/utils/analytics';
+import { trackFormSubmission, trackConversion, trackErrorEvent, trackLeadQualityDistribution } from '@/utils/analytics';
+import { calculateLeadQuality } from '@/utils/leadScoring';
 
 interface SubmissionContext {
   state: ChatbotState;
@@ -26,6 +27,52 @@ export const submitForm = async (context: SubmissionContext) => {
       chatTranscript: state.messages
     };
 
+    // Calculate lead quality and score
+    const leadScore = calculateLeadQuality(state.formData);
+    console.log('Lead scoring result:', leadScore);
+
+    // Track lead quality distribution
+    trackLeadQualityDistribution(leadScore.quality, leadScore.score, leadScore.factors);
+
+    // Save lead to Supabase database
+    try {
+      const leadData = {
+        name: state.formData.contact?.name,
+        email: state.formData.contact?.email,
+        phone: state.formData.contact?.phone,
+        from_address: state.formData.from,
+        to_address: state.formData.to,
+        volume: state.formData.volume,
+        price_calculation: state.formData.priceCalculation,
+        lead_quality: leadScore.quality,
+        lead_score: leadScore.score,
+        status: 'new',
+        submission_type: state.submissionType,
+        move_date: state.formData.date,
+        distance_data: state.formData.distanceData,
+        additional_info: state.formData.additionalInfo,
+        chat_transcript: state.messages
+      };
+
+      const { data: leadResult, error: leadError } = await supabase
+        .from('leads')
+        .insert([leadData])
+        .select()
+        .single();
+
+      if (leadError) {
+        console.error('Lead save error:', leadError);
+        trackErrorEvent('lead_save_failed', leadError.message, { submissionType: state.submissionType });
+      } else {
+        console.log('Lead saved successfully:', leadResult);
+      }
+    } catch (leadSaveError) {
+      console.error('Lead save exception:', leadSaveError);
+      trackErrorEvent('lead_save_exception', leadSaveError instanceof Error ? leadSaveError.message : 'Unknown error', { 
+        submissionType: state.submissionType 
+      });
+    }
+
     // Track form submission
     trackFormSubmission(state.submissionType!, state.formData);
 
@@ -42,25 +89,21 @@ export const submitForm = async (context: SubmissionContext) => {
 
     if (data?.success) {
       let successMessage = '';
-      let leadQuality = 'medium';
       let estimatedValue = 0;
       
       if (state.submissionType === 'offert') {
         successMessage = `Perfekt! Din preliminära offert har skickats. Du får bekräftelse och vi kontaktar dig inom 12 timmar på ${state.formData.contact?.email}. Ärendenummer: ${submission.id.slice(0, 8)}`;
-        leadQuality = 'high';
         estimatedValue = state.formData.priceCalculation?.totalPrice || 5000;
       } else if (state.submissionType === 'kontorsflytt') {
         successMessage = `Tack! Din kontorsflytt-förfrågan har registrerats. Vi återkommer via e-post för att diskutera detaljerna. Ärendenummer: ${submission.id.slice(0, 8)}`;
-        leadQuality = 'high';
         estimatedValue = 15000; // Higher value for office moves
       } else if (state.submissionType === 'volymuppskattning') {
         successMessage = `Perfekt! En flyttkoordinator kommer att kontakta dig för volymuppskattning. Vi hör av oss inom 24 timmar på ${state.formData.contact?.email}. Ärendenummer: ${submission.id.slice(0, 8)}`;
-        leadQuality = 'medium';
         estimatedValue = 3000;
       }
 
-      // Track conversion
-      trackConversion(leadQuality, estimatedValue, state.submissionType!);
+      // Track conversion with enhanced lead data
+      trackConversion(leadScore.quality, estimatedValue, state.submissionType!, leadScore.score, leadScore.factors);
 
       addMessage(successMessage, 'bot');
       addMessage('\n**Viktigt:** Kontrollera din skräppostmapp om du inte ser vårt bekräftelsemail inom kort.', 'bot');

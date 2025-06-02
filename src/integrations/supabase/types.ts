@@ -9,7 +9,66 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      leads: {
+        Row: {
+          additional_info: string | null
+          chat_transcript: Json | null
+          created_at: string | null
+          distance_data: Json | null
+          email: string | null
+          from_address: Json | null
+          id: string
+          lead_quality: string | null
+          lead_score: number | null
+          move_date: string | null
+          name: string | null
+          phone: string | null
+          price_calculation: Json | null
+          status: string | null
+          submission_type: string | null
+          to_address: Json | null
+          volume: number | null
+        }
+        Insert: {
+          additional_info?: string | null
+          chat_transcript?: Json | null
+          created_at?: string | null
+          distance_data?: Json | null
+          email?: string | null
+          from_address?: Json | null
+          id?: string
+          lead_quality?: string | null
+          lead_score?: number | null
+          move_date?: string | null
+          name?: string | null
+          phone?: string | null
+          price_calculation?: Json | null
+          status?: string | null
+          submission_type?: string | null
+          to_address?: Json | null
+          volume?: number | null
+        }
+        Update: {
+          additional_info?: string | null
+          chat_transcript?: Json | null
+          created_at?: string | null
+          distance_data?: Json | null
+          email?: string | null
+          from_address?: Json | null
+          id?: string
+          lead_quality?: string | null
+          lead_score?: number | null
+          move_date?: string | null
+          name?: string | null
+          phone?: string | null
+          price_calculation?: Json | null
+          status?: string | null
+          submission_type?: string | null
+          to_address?: Json | null
+          volume?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

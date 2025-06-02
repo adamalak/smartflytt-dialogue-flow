@@ -21,9 +21,11 @@ export const trackFlowStep = (step: string, data?: any) => {
   });
 };
 
-export const trackConversion = (leadQuality: string, estimatedValue: number, submissionType: string) => {
+export const trackConversion = (leadQuality: string, estimatedValue: number, submissionType: string, leadScore?: number, leadFactors?: string[]) => {
   trackEvent('lead_generated', {
     lead_quality: leadQuality,
+    lead_score: leadScore,
+    lead_factors: leadFactors?.join(', '),
     estimated_value: estimatedValue,
     submission_type: submissionType,
     timestamp: new Date().toISOString()
@@ -69,6 +71,15 @@ export const trackPriceCalculation = (volume: number, estimatedPrice: number, di
 export const trackVolumeCoordinatorRequest = (reason: string) => {
   trackEvent('volume_coordinator_requested', {
     reason: reason,
+    timestamp: new Date().toISOString()
+  });
+};
+
+export const trackLeadQualityDistribution = (leadQuality: string, leadScore: number, factors: string[]) => {
+  trackEvent('lead_quality_calculated', {
+    lead_quality: leadQuality,
+    lead_score: leadScore,
+    scoring_factors: factors.join(', '),
     timestamp: new Date().toISOString()
   });
 };
