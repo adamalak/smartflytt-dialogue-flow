@@ -2,6 +2,7 @@
 import { StepHandlerContext } from './stepHandlers';
 import { supabase } from '@/integrations/supabase/client';
 import { calculatePrice, formatPriceBreakdown } from './priceCalculation';
+import { trackPriceCalculation, trackErrorEvent } from '@/utils/analytics';
 
 export const handlePriceCalculationStep = async (formData: any, context: StepHandlerContext) => {
   const { addMessage, setCurrentStep, updateFormData } = context;
@@ -28,6 +29,7 @@ export const handlePriceCalculationStep = async (formData: any, context: StepHan
 
     if (error) {
       console.error('Distance calculation error:', error);
+      trackErrorEvent('distance_calculation_failed', error.message, { fromAddress, toAddress });
       addMessage('Det uppstod ett problem vid beräkning av körsträckor. Kontakta oss direkt på smartflyttlogistik@gmail.com', 'bot');
       return;
     }
@@ -42,6 +44,9 @@ export const handlePriceCalculationStep = async (formData: any, context: StepHan
     });
 
     console.log('Price calculation result:', priceCalculation);
+
+    // Track price calculation
+    trackPriceCalculation(formData.volume, priceCalculation.totalPrice, distanceData);
 
     // Update form data with distance and price information
     updateFormData({ 
@@ -60,6 +65,11 @@ export const handlePriceCalculationStep = async (formData: any, context: StepHan
 
   } catch (error) {
     console.error('Price calculation error:', error);
+    trackErrorEvent('price_calculation_exception', error instanceof Error ? error.message : 'Unknown error', { 
+      volume: formData.volume,
+      hasFromAddress: !!formData.from,
+      hasToAddress: !!formData.to
+    });
     addMessage('Det uppstod ett tekniskt fel vid prisberäkningen. Kontakta oss direkt på smartflyttlogistik@gmail.com', 'bot');
   }
 };

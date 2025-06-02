@@ -1,8 +1,8 @@
-
 import { FlowStep } from '@/types/chatbot';
 import { CHATBOT_CONSTANTS } from '@/data/constants';
 import { validateInput } from '@/utils/validation';
 import { faqData } from '@/data/faq';
+import { trackVolumeCoordinatorRequest, trackErrorEvent } from '@/utils/analytics';
 
 export interface StepHandlerContext {
   message: string;
@@ -139,6 +139,9 @@ export const handleVolumeCoordinatorStep = async (message: string, context: Step
   const lowerMessage = message.toLowerCase();
 
   if (lowerMessage.includes('ja')) {
+    // Track volume coordinator request
+    trackVolumeCoordinatorRequest('unsure_about_volume');
+    
     setSubmissionType('volymuppskattning');
     updateFormData({ wantsVolumeCoordinator: true });
     addMessage('Perfekt! Vi skickar ut en flyttkoordinator för volymuppskattning. Kom ihåg att en avgiftsfri uppskattning förutsätter att du sedan bokar flytten med oss.', 'bot');

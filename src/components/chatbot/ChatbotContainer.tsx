@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useChatbotState } from '@/hooks/useChatbotState';
 import { DialogManager } from './DialogManager';
 import { ChatMessages } from './ChatMessages';
 import { ChatInput } from './ChatInput';
 import { ProgressIndicator } from './ProgressIndicator';
+import { trackFlowStep, trackFormAbandonment } from '@/utils/analytics';
 
 export const ChatbotContainer: React.FC = () => {
   const chatbotState = useChatbotState();
@@ -12,6 +13,34 @@ export const ChatbotContainer: React.FC = () => {
   const handleSendMessage = (message: string) => {
     chatbotState.addMessage(message, 'user');
   };
+
+  // Track flow step changes
+  useEffect(() => {
+    if (chatbotState.state.currentStep !== 'welcome') {
+      trackFlowStep(chatbotState.state.currentStep, {
+        message_count: chatbotState.state.messages.length,
+        form_data_keys: Object.keys(chatbotState.state.formData),
+        submission_type: chatbotState.state.submissionType
+      });
+    }
+  }, [chatbotState.state.currentStep, chatbotState.state.messages.length, chatbotState.state.submissionType]);
+
+  // Track form abandonment on page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (chatbotState.state.currentStep !== 'welcome' && chatbotState.state.currentStep !== 'submitted') {
+        // Calculate completion percentage based on step order
+        const stepOrder = ['welcome', 'moveType', 'date', 'fromAddress', 'toAddress', 'rooms', 'volume', 'elevator', 'priceCalculation', 'contact', 'gdpr', 'submitted'];
+        const currentIndex = stepOrder.indexOf(chatbotState.state.currentStep);
+        const completionPercentage = currentIndex > 0 ? (currentIndex / (stepOrder.length - 1)) * 100 : 0;
+        
+        trackFormAbandonment(chatbotState.state.currentStep, completionPercentage);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [chatbotState.state.currentStep]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 flex items-center justify-center p-4">
