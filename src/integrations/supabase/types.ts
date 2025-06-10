@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           additional_info: string | null
           chat_transcript: Json | null
+          company_id: string | null
           created_at: string | null
           distance_data: Json | null
           email: string | null
@@ -32,6 +33,7 @@ export type Database = {
         Insert: {
           additional_info?: string | null
           chat_transcript?: Json | null
+          company_id?: string | null
           created_at?: string | null
           distance_data?: Json | null
           email?: string | null
@@ -51,6 +53,7 @@ export type Database = {
         Update: {
           additional_info?: string | null
           chat_transcript?: Json | null
+          company_id?: string | null
           created_at?: string | null
           distance_data?: Json | null
           email?: string | null

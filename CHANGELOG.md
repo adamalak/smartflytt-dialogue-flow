@@ -1,6 +1,43 @@
 
 # CHANGELOG
 
+## [2025-06-10] - Admin Dashboard & A/B Testing Update
+
+### Lagt till
+
+#### Admin Dashboard System
+- **Komponent**: `AdminDashboard` - Komplett admin-panel för lead-hantering med real-time statistik
+- **Komponent**: `AdminAuth` - Lösenordsskyddad inloggning för admin-åtkomst
+- **Komponent**: `StatisticsCards` - Dashboard-kort som visar totala leads, premium leads, konverteringsgrad och dagsstatistik
+- **Komponent**: `LeadsTable` - Interaktiv tabell för lead-hantering med status-uppdatering
+- **Sida**: `AdminPage` - Dedikerad admin-sida tillgänglig på `/admin`
+
+#### A/B Testing Infrastructure
+- **Utility**: `abTesting.ts` - Komplett A/B testing-system med hash-baserad användar-segmentering
+- **Test**: `welcomeMessageTest` - Första A/B test för välkomstmeddelanden med två varianter
+- **Funktion**: `getABTestVariant` - Deterministisk variant-tilldelning baserat på användar-ID
+- **Funktion**: `trackABTestEvent` - Analytics-spårning för test-exponering och konverteringar
+- **Utility**: `userSession.ts` - Hantering av beständiga användar-sessioner för konsistent A/B test-upplevelse
+
+#### Databas-förbättringar
+- **Kolumn**: `company_id` tillagd i leads-tabellen för framtida multi-tenant support
+- **Index**: Prestanda-optimering för lead_quality, status, created_at och company_id
+- **RLS Policies**: Row Level Security för säker admin-åtkomst till lead-data
+
+#### Funktionalitet
+- **Real-time statistik**: Live-uppdatering av lead-metrics och konverteringsgrad
+- **Status-hantering**: Interaktiv lead-status uppdatering (Ny, Kontaktad, Kvalificerad, Konverterad, Stängd)
+- **Mobilanpassning**: Responsiv design för admin-dashboard på alla enheter
+- **A/B Test Integration**: Automatisk variant-tilldelning och spårning i chatbot-flödet
+- **Analytics Enhancement**: Utökad spårning för A/B test-prestanda och användar-segmentering
+
+### Teknisk arkitektur
+- **Authentication**: Lösenordsbaserad admin-autentisering
+- **Data Management**: Supabase integration med RLS för säker data-åtkomst
+- **A/B Testing**: Deterministisk hash-baserad segmentering för konsistenta användar-upplevelser
+- **Performance**: Databas-indexering och optimerad query-hantering
+- **UI/UX**: Shadcn/ui komponenter med Tailwind CSS för konsistent design
+
 ## [2025-06-02] - Initial Release
 
 ### Lagt till
@@ -65,4 +102,3 @@
 - **Email delivery**: Redundant email-system med SendGrid + Supabase
 - **Validation**: Robust input-validering på alla nivåer
 - **Error boundaries**: Felhantering på komponent- och application-nivå
-
