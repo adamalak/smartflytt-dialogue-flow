@@ -75,11 +75,12 @@ export const processUserMessage = async ({
       break;
 
     case 'rooms':
-      const roomsMapping: { [key: string]: string } = {
-        '1': '1rok',
-        '2': '2rok', 
-        '3': '3rok',
-        '4': '4rok',
+      // Fix: Use proper literal types for rooms
+      const roomsMapping: { [key: string]: '1rok' | '2rok' | '3rok' | '4rok' | 'villa' | 'kontor' | 'annat' } = {
+        '1rok': '1rok',
+        '2rok': '2rok', 
+        '3rok': '3rok',
+        '4rok': '4rok',
         'villa': 'villa',
         'kontor': 'kontor',
         'annat': 'annat'

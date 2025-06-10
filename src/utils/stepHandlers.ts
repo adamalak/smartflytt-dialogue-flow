@@ -104,13 +104,17 @@ export const handleDate = (context: StepContext, date: string) => {
   }, 1000);
 };
 
-export const handleRooms = (context: StepContext, rooms: '1 rok' | '2 rok' | '3 rok' | 'villa' | 'annat') => {
+export const handleRooms = (context: StepContext, rooms: '1rok' | '2rok' | '3rok' | '4rok' | 'villa' | 'kontor' | 'annat') => {
   const { state, addMessage, setCurrentStep } = context;
 
   state.formData.rooms = rooms;
   trackFlowStep('rooms', { rooms });
 
-  addMessage(`Du har ett bohag på ${rooms}.`, 'bot');
+  // Get room label from config
+  const roomOption = SMARTFLYTT_CONFIG.ROOM_OPTIONS.find(r => r.value === rooms);
+  const roomLabel = roomOption ? roomOption.label : rooms;
+
+  addMessage(`Du har valt ${roomLabel}.`, 'bot');
   setTimeout(() => {
     addMessage('Ungefär hur många kubikmeter uppskattar du?', 'bot');
     setCurrentStep('volume');
