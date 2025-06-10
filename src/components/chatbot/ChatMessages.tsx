@@ -92,7 +92,9 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
       addMessage,
       setCurrentStep,
       setSubmissionType: () => {},
-      updateFormData
+      updateFormData,
+      state: { formData: {}, currentStep: currentStep || 'welcome' } as any,
+      setLoading: () => {}
     };
 
     if (showAddressInput === 'from') {

@@ -1,4 +1,3 @@
-
 import { ChatbotState } from '@/types/chatbot';
 import { trackFlowStep, trackFormAbandonment } from '@/utils/analytics';
 import { submitForm } from '@/utils/formSubmission';
@@ -149,7 +148,7 @@ export const handleAdditionalInfo = (context: StepContext, additionalInfo: strin
   }, 1000);
 };
 
-export const handleContact = async (context: StepContext, contactInfo: any) => {
+export const handleContact = async (context: StepHandlerContext, contactInfo: any) => {
   const { state, addMessage, setCurrentStep, setLoading, updateFormData } = context;
 
   if (!contactInfo.name || !contactInfo.email || !contactInfo.phone) {
@@ -212,8 +211,8 @@ export const handleConfirmation = (context: StepContext, confirmation: boolean) 
   }
 };
 
-export const handleCompanyInfo = (context: StepContext, companyInfo: any) => {
-  const { state, addMessage, setCurrentStep } = context;
+export const handleCompanyInfo = (context: StepHandlerContext, companyInfo: any) => {
+  const { state, addMessage, setCurrentStep, updateFormData } = context;
 
   if (!companyInfo.companyName || !companyInfo.contactName || !companyInfo.email || !companyInfo.phone) {
     addMessage('Du måste ange företagsnamn, kontaktperson, e-post och telefonnummer.', 'bot');
@@ -231,17 +230,16 @@ export const handleCompanyInfo = (context: StepContext, companyInfo: any) => {
   }
 
   // Add company info to form data
-  state.formData = {
-    ...state.formData,
+  updateFormData({
     companyInfo
-  };
+  });
   
   trackFlowStep('companyInfo', { companyInfo });
 
   addMessage(`Tack!`, 'bot');
   setTimeout(() => {
     addMessage('Vart vill ni flytta?', 'bot');
-    setCurrentStep('address');
+    setCurrentStep('fromAddress');
   }, 1000);
 };
 

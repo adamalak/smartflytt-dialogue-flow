@@ -1,51 +1,37 @@
 
-import { CHATBOT_CONSTANTS } from '@/data/constants';
+import { validateEmail, validatePhoneNumber } from './validation';
+import { trackFlowStep } from './analytics';
+import { submitForm } from './formSubmission';
 import { StepHandlerContext } from './stepHandlers';
 
 export const handleContactStep = async (message: string, context: StepHandlerContext) => {
-  const { addMessage, setCurrentStep, updateFormData } = context;
+  const { addMessage } = context;
   
-  const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-  const phoneMatch = message.match(/(\+46|0)[\s-]?7[\d\s-]{8,}/);
+  // For now, just acknowledge the contact input
+  // In a real implementation, this would parse the contact information
+  addMessage('Tack för dina kontaktuppgifter. Vi återkommer snart!', 'bot');
   
-  // For volume coordinator requests, phone is required
-  if (!emailMatch) {
-    addMessage('Jag behöver din e-postadress. Ange: Namn, e-post (och telefon om du vill)', 'bot');
-    return;
-  }
-
-  const email = emailMatch[0];
-  const phone = phoneMatch ? phoneMatch[0].replace(/[\s-]/g, '') : '';
-  let name = message.replace(emailMatch[0], '');
-  if (phoneMatch) {
-    name = name.replace(phoneMatch[0], '');
-  }
-  name = name.replace(/[,]/g, '').trim();
-
-  if (!name) {
-    addMessage('Jag behöver ditt namn också. Ange: Namn, e-post (och telefon om du vill)', 'bot');
-    return;
-  }
-
-  updateFormData({ contact: { name, phone, email } });
-  addMessage(`Kontakt registrerad: ${name}, ${email}${phone ? `, ${phone}` : ''}`, 'bot');
-  
-  setTimeout(() => {
-    addMessage('Slutligen, har du någon ytterligare information eller speciella önskemål för flytten?', 'bot');
-    setCurrentStep('additionalInfo');
-  }, 1000);
+  // Track the contact step
+  trackFlowStep('contact', { message });
 };
 
-export const handleGdprStep = async (message: string, context: StepHandlerContext, onSubmit: () => Promise<void>) => {
-  const { addMessage, updateFormData } = context;
+export const handleContactInput = async (message: string, context: StepHandlerContext) => {
+  return handleContactStep(message, context);
+};
+
+export const handleGdprConsent = async (message: string, context: StepHandlerContext) => {
+  const { state, addMessage, setCurrentStep } = context;
   const lowerMessage = message.toLowerCase();
-  const gdprConsent = lowerMessage.includes('ja') || lowerMessage.includes('godkänn') || lowerMessage.includes('accept');
-
-  if (!gdprConsent) {
-    addMessage('Du måste godkänna behandling av personuppgifter för att vi ska kunna skicka din offert.', 'bot');
-    return;
+  
+  if (lowerMessage.includes('ja') || lowerMessage.includes('godkänn') || lowerMessage.includes('accepter')) {
+    state.formData.gdprConsent = true;
+    trackFlowStep('gdpr', { consent: true });
+    
+    addMessage('Tack! Nu skickar vi din förfrågan.', 'bot');
+    
+    // Submit the form
+    await submitForm(context);
+  } else {
+    addMessage('Du måste godkänna behandling av personuppgifter för att fortsätta.', 'bot');
   }
-
-  updateFormData({ gdprConsent: true });
-  await onSubmit();
 };

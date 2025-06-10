@@ -8,11 +8,11 @@ import {
   handleAdditionalInfo,
   StepHandlerContext
 } from './stepHandlers';
-import { handleAddressInput, handleElevatorSelection } from './addressHandlers';
-import { handleContactInput, handleGdprConsent } from './contactHandlers';
+import { handleFromAddressSubmission, handleToAddressSubmission } from './addressHandlers';
+import { handleContactStep } from './contactHandlers';
 import { ChatbotState, FlowStep } from '@/types/chatbot';
-import { trackUserInteraction } from '@/utils/analytics';
-import { FAQ_DATA } from '@/data/faq';
+import { trackFlowStep } from '@/utils/analytics';
+import { faqData } from '@/data/faq';
 
 interface MessageProcessorProps {
   message: string;
@@ -38,7 +38,7 @@ export const processUserMessage = async ({
   const lowerMessage = message.toLowerCase().trim();
   
   // Track user interaction
-  trackUserInteraction(state.currentStep, message, state.submissionType);
+  trackFlowStep(state.currentStep, { message, submissionType: state.submissionType });
 
   const context: StepHandlerContext = {
     state,
@@ -108,20 +108,14 @@ export const processUserMessage = async ({
       handleAdditionalInfo(context, message);
       break;
 
-    case 'address':
-      await handleAddressInput(message, context);
-      break;
-
-    case 'elevator':
-      await handleElevatorSelection(message, context);
+    case 'fromAddress':
+    case 'toAddress':
+      // These are handled by the UI components directly
+      addMessage('Använd formuläret ovan för att ange adress.', 'bot');
       break;
 
     case 'contact':
-      await handleContactInput(message, context);
-      break;
-
-    case 'gdpr':
-      await handleGdprConsent(message, context);
+      await handleContactStep(message, context);
       break;
 
     default:
@@ -134,12 +128,11 @@ const handleFAQ = (message: string, addMessage: (content: string, type: 'bot' | 
   const lowerMessage = message.toLowerCase();
   
   // Find matching FAQ
-  for (const category of FAQ_DATA) {
-    for (const faq of category.items) {
-      if (faq.keywords.some(keyword => lowerMessage.includes(keyword))) {
-        addMessage(faq.answer, 'bot');
-        return;
-      }
+  for (const faq of faqData) {
+    if (faq.question.toLowerCase().includes(lowerMessage) || 
+        faq.answer.toLowerCase().includes(lowerMessage)) {
+      addMessage(faq.answer, 'bot');
+      return;
     }
   }
   
