@@ -1,129 +1,20 @@
 
-import { CHATBOT_CONSTANTS } from '@/data/constants';
-
-export interface ValidationResult {
-  isValid: boolean;
-  error?: string;
-}
-
-export const validateInput = (type: string, value: string): ValidationResult => {
-  const trimmedValue = value.trim();
-
-  switch (type) {
-    case 'date':
-      return validateDate(trimmedValue);
-    case 'postal':
-      return validatePostal(trimmedValue);
-    case 'phone':
-      return validatePhone(trimmedValue);
-    case 'email':
-      return validateEmail(trimmedValue);
-    case 'name':
-      return validateName(trimmedValue);
-    case 'city':
-      return validateCity(trimmedValue);
-    case 'volume':
-      return validateVolume(trimmedValue);
-    default:
-      return { isValid: true };
-  }
+export const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 };
 
-const validateDate = (value: string): ValidationResult => {
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  
-  if (!dateRegex.test(value)) {
-    return {
-      isValid: false,
-      error: CHATBOT_CONSTANTS.VALIDATION_MESSAGES.INVALID_DATE
-    };
-  }
-
-  const date = new Date(value);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  if (date < today) {
-    return {
-      isValid: false,
-      error: CHATBOT_CONSTANTS.VALIDATION_MESSAGES.INVALID_DATE
-    };
-  }
-
-  return { isValid: true };
+export const validatePhoneNumber = (phone: string): boolean => {
+  const phoneRegex = /^07[0-9]{8}$/;
+  return phoneRegex.test(phone.replace(/\s/g, ''));
 };
 
-const validatePostal = (value: string): ValidationResult => {
-  const postalRegex = /^\d{5}$/;
-  
-  if (!postalRegex.test(value)) {
-    return {
-      isValid: false,
-      error: CHATBOT_CONSTANTS.VALIDATION_MESSAGES.INVALID_POSTAL
-    };
-  }
-
-  return { isValid: true };
+export const validateDate = (date: string): boolean => {
+  const dateObj = new Date(date);
+  return !isNaN(dateObj.getTime()) && dateObj > new Date();
 };
 
-const validatePhone = (value: string): ValidationResult => {
-  const phoneRegex = /^(07\d{8}|(\+46|0046)7\d{8})$/;
-  const cleanPhone = value.replace(/[\s-]/g, '');
-  
-  if (!phoneRegex.test(cleanPhone)) {
-    return {
-      isValid: false,
-      error: CHATBOT_CONSTANTS.VALIDATION_MESSAGES.INVALID_PHONE
-    };
-  }
-
-  return { isValid: true };
-};
-
-const validateEmail = (value: string): ValidationResult => {
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  
-  if (!emailRegex.test(value)) {
-    return {
-      isValid: false,
-      error: CHATBOT_CONSTANTS.VALIDATION_MESSAGES.INVALID_EMAIL
-    };
-  }
-
-  return { isValid: true };
-};
-
-const validateName = (value: string): ValidationResult => {
-  if (value.length < 2) {
-    return {
-      isValid: false,
-      error: CHATBOT_CONSTANTS.VALIDATION_MESSAGES.MIN_LENGTH(2)
-    };
-  }
-
-  return { isValid: true };
-};
-
-const validateCity = (value: string): ValidationResult => {
-  if (value.length < 2) {
-    return {
-      isValid: false,
-      error: CHATBOT_CONSTANTS.VALIDATION_MESSAGES.MIN_CITY_LENGTH
-    };
-  }
-
-  return { isValid: true };
-};
-
-const validateVolume = (value: string): ValidationResult => {
-  const volume = parseFloat(value);
-  
-  if (isNaN(volume) || volume <= 0) {
-    return {
-      isValid: false,
-      error: CHATBOT_CONSTANTS.VALIDATION_MESSAGES.INVALID_VOLUME
-    };
-  }
-
-  return { isValid: true };
+export const validatePostalCode = (postalCode: string): boolean => {
+  const postalRegex = /^[0-9]{3}\s?[0-9]{2}$/;
+  return postalRegex.test(postalCode);
 };

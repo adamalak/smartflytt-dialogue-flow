@@ -1,21 +1,18 @@
 
-import { FlowStep, ChatbotState } from '@/types/chatbot';
 import { 
-  handleWelcomeStep, 
-  handleMoveTypeStep, 
-  handleDateStep, 
-  handleFaqStep, 
-  handleServicesStep,
-  handleRoomsStep,
-  handleVolumeStep,
-  handleVolumeCoordinatorStep,
-  handleAdditionalInfoStep,
-  StepHandlerContext 
+  handleWelcome,
+  handleMoveType,
+  handleDate,
+  handleRooms,
+  handleVolume,
+  handleAdditionalInfo,
+  StepHandlerContext
 } from './stepHandlers';
-import { handleFromAddressStep, handleToAddressStep, handleElevatorStep } from './addressHandlers';
-import { handleContactStep, handleGdprStep } from './contactHandlers';
-import { handlePriceCalculationStep } from './priceCalculationHandler';
-import { submitForm } from './formSubmission';
+import { handleAddressInput, handleElevatorSelection } from './addressHandlers';
+import { handleContactInput, handleGdprConsent } from './contactHandlers';
+import { ChatbotState, FlowStep } from '@/types/chatbot';
+import { trackUserInteraction } from '@/utils/analytics';
+import { FAQ_DATA } from '@/data/faq';
 
 interface MessageProcessorProps {
   message: string;
@@ -28,93 +25,124 @@ interface MessageProcessorProps {
   setError: (error: string | null) => void;
 }
 
-export const processUserMessage = async (props: MessageProcessorProps) => {
-  const { 
-    message, 
-    state, 
-    addMessage, 
-    setCurrentStep, 
-    setSubmissionType, 
-    updateFormData, 
-    setLoading, 
-    setError 
-  } = props;
+export const processUserMessage = async ({
+  message,
+  state,
+  addMessage,
+  setCurrentStep,
+  setSubmissionType,
+  updateFormData,
+  setLoading,
+  setError
+}: MessageProcessorProps) => {
+  const lowerMessage = message.toLowerCase().trim();
+  
+  // Track user interaction
+  trackUserInteraction(state.currentStep, message, state.submissionType);
 
-  setLoading(true);
-  setError(null);
+  const context: StepHandlerContext = {
+    state,
+    addMessage,
+    setCurrentStep: setCurrentStep as any,
+    setLoading,
+    updateFormData
+  };
 
-  try {
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate thinking
-
-    const context: StepHandlerContext = {
-      message,
-      addMessage,
-      setCurrentStep,
-      setSubmissionType,
-      updateFormData
-    };
-
-    const submissionContext = {
-      state,
-      addMessage,
-      setCurrentStep,
-      setLoading
-    };
-
-    switch (state.currentStep) {
-      case 'welcome':
-        await handleWelcomeStep(message, context);
-        break;
-      case 'moveType':
-        await handleMoveTypeStep(message, context);
-        break;
-      case 'date':
-        await handleDateStep(message, context);
-        break;
-      case 'fromAddress':
-        await handleFromAddressStep(message, context);
-        break;
-      case 'toAddress':
-        await handleToAddressStep(message, context);
-        break;
-      case 'rooms':
-        await handleRoomsStep(message, context);
-        break;
-      case 'volume':
-        await handleVolumeStep(message, context);
-        break;
-      case 'volumeCoordinator':
-        await handleVolumeCoordinatorStep(message, context);
-        break;
-      case 'elevator':
-        await handleElevatorStep(message, context);
-        break;
-      case 'priceCalculation':
-        await handlePriceCalculationStep(state.formData, context);
-        break;
-      case 'contact':
-        await handleContactStep(message, context);
-        break;
-      case 'additionalInfo':
-        await handleAdditionalInfoStep(message, context);
-        break;
-      case 'gdpr':
-        await handleGdprStep(message, context, () => submitForm(submissionContext));
-        break;
-      case 'faq':
-        await handleFaqStep(message, context);
-        break;
-      case 'services':
-        await handleServicesStep(message, context);
-        break;
-      default:
-        addMessage('Förlåt, jag förstod inte det. Kan du upprepa?', 'bot');
-    }
-  } catch (error) {
-    console.error('Error processing message:', error);
-    setError('Ett fel uppstod. Försök igen.');
-    addMessage('Ett tekniskt fel uppstod. Försök igen eller kontakta oss direkt på smartflyttlogistik@gmail.com.', 'bot');
+  // Handle quick replies and navigation
+  if (lowerMessage === 'offert' || lowerMessage === 'få offert') {
+    setSubmissionType('offert');
+    handleMoveType(context, 'offert');
+    return;
   }
 
-  setLoading(false);
+  if (lowerMessage === 'kontorsflytt') {
+    setSubmissionType('kontorsflytt');
+    handleMoveType(context, 'kontorsflytt');
+    return;
+  }
+
+  if (lowerMessage === 'volymuppskattning') {
+    setSubmissionType('volymuppskattning');
+    handleMoveType(context, 'volymuppskattning');
+    return;
+  }
+
+  // Handle FAQ
+  if (lowerMessage.includes('fråga') || lowerMessage.includes('hjälp') || lowerMessage.includes('?')) {
+    handleFAQ(message, addMessage);
+    return;
+  }
+
+  // Handle step-specific logic
+  switch (state.currentStep) {
+    case 'welcome':
+      handleWelcome(context);
+      break;
+
+    case 'date':
+      handleDate(context, message);
+      break;
+
+    case 'rooms':
+      const roomsMapping: { [key: string]: '1 rok' | '2 rok' | '3 rok' | 'villa' | 'annat' } = {
+        '1': '1 rok',
+        '2': '2 rok', 
+        '3': '3 rok',
+        'villa': 'villa',
+        'annat': 'annat'
+      };
+      const rooms = roomsMapping[lowerMessage] || 'annat';
+      handleRooms(context, rooms);
+      break;
+
+    case 'volume':
+      const volume = parseFloat(message);
+      if (!isNaN(volume)) {
+        handleVolume(context, volume);
+      } else {
+        addMessage('Ange en giltig volym i kubikmeter.', 'bot');
+      }
+      break;
+
+    case 'additionalInfo':
+      handleAdditionalInfo(context, message);
+      break;
+
+    case 'address':
+      await handleAddressInput(message, context);
+      break;
+
+    case 'elevator':
+      await handleElevatorSelection(message, context);
+      break;
+
+    case 'contact':
+      await handleContactInput(message, context);
+      break;
+
+    case 'gdpr':
+      await handleGdprConsent(message, context);
+      break;
+
+    default:
+      addMessage('Jag förstår inte riktigt. Kan du försöka igen?', 'bot');
+      break;
+  }
+};
+
+const handleFAQ = (message: string, addMessage: (content: string, type: 'bot' | 'user') => void) => {
+  const lowerMessage = message.toLowerCase();
+  
+  // Find matching FAQ
+  for (const category of FAQ_DATA) {
+    for (const faq of category.items) {
+      if (faq.keywords.some(keyword => lowerMessage.includes(keyword))) {
+        addMessage(faq.answer, 'bot');
+        return;
+      }
+    }
+  }
+  
+  // Default FAQ response
+  addMessage('Här är några vanliga frågor jag kan hjälpa med:\n\n• Vad kostar det att flytta?\n• Hur lång tid tar en flytt?\n• Vad ingår i tjänsten?\n• Hur bokar jag en flytt?\n\nFråga mig gärna något specifikt!', 'bot');
 };

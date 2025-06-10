@@ -1,8 +1,18 @@
+
 import { ChatbotState } from '@/types/chatbot';
 import { trackFlowStep, trackFormAbandonment } from '@/utils/analytics';
 import { submitForm } from '@/utils/formSubmission';
-import { calculatePrice } from '@/utils/priceCalculationHandler';
+import { handlePriceCalculationStep } from '@/utils/priceCalculationHandler';
 import { validateEmail, validatePhoneNumber } from '@/utils/validation';
+
+export interface StepHandlerContext {
+  state: ChatbotState;
+  addMessage: (content: string, type: 'bot' | 'user', isQuickReply?: boolean) => void;
+  setCurrentStep: (step: any) => void;
+  setLoading: (loading: boolean) => void;
+  updateFormData: (data: any) => void;
+  analyticsData?: any;
+}
 
 interface StepContext {
   state: ChatbotState;
@@ -29,7 +39,7 @@ export const handleWelcome = (context: StepContext) => {
   addMessage('Vad vill du göra?', 'bot', true);
 };
 
-export const handleMoveType = (context: StepContext, moveType: string) => {
+export const handleMoveType = (context: StepContext, moveType: 'offert' | 'kontorsflytt' | 'volymuppskattning') => {
   const { state, addMessage, setCurrentStep } = context;
 
   state.submissionType = moveType;
@@ -95,7 +105,7 @@ export const handleDate = (context: StepContext, date: string) => {
   }, 1000);
 };
 
-export const handleRooms = (context: StepContext, rooms: string) => {
+export const handleRooms = (context: StepContext, rooms: '1 rok' | '2 rok' | '3 rok' | 'villa' | 'annat') => {
   const { state, addMessage, setCurrentStep } = context;
 
   state.formData.rooms = rooms;
@@ -140,7 +150,7 @@ export const handleAdditionalInfo = (context: StepContext, additionalInfo: strin
 };
 
 export const handleContact = async (context: StepContext, contactInfo: any) => {
-  const { state, addMessage, setCurrentStep } = context;
+  const { state, addMessage, setCurrentStep, setLoading, updateFormData } = context;
 
   if (!contactInfo.name || !contactInfo.email || !contactInfo.phone) {
     addMessage('Du måste ange namn, e-post och telefonnummer.', 'bot');
@@ -162,7 +172,13 @@ export const handleContact = async (context: StepContext, contactInfo: any) => {
 
   addMessage(`Tack ${contactInfo.name}!`, 'bot');
 
-  await calculatePrice(context);
+  await handlePriceCalculationStep(state.formData, {
+    addMessage,
+    setCurrentStep,
+    updateFormData,
+    setLoading,
+    state
+  });
 };
 
 export const handlePriceCalculation = (context: StepContext, priceCalculation: any) => {
@@ -214,7 +230,12 @@ export const handleCompanyInfo = (context: StepContext, companyInfo: any) => {
     return;
   }
 
-  state.formData.companyInfo = companyInfo;
+  // Add company info to form data
+  state.formData = {
+    ...state.formData,
+    companyInfo
+  };
+  
   trackFlowStep('companyInfo', { companyInfo });
 
   addMessage(`Tack!`, 'bot');
