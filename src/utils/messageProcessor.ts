@@ -12,7 +12,7 @@ import { handleFromAddressSubmission, handleToAddressSubmission } from './addres
 import { handleContactStep } from './contactHandlers';
 import { ChatbotState, FlowStep } from '@/types/chatbot';
 import { trackFlowStep } from '@/utils/analytics';
-import { faqData } from '@/data/faq';
+import { SMARTFLYTT_CONFIG } from '@/data/constants';
 
 interface MessageProcessorProps {
   message: string;
@@ -48,28 +48,19 @@ export const processUserMessage = async ({
     updateFormData
   };
 
-  // Handle quick replies and navigation
-  if (lowerMessage === 'offert' || lowerMessage === 'få offert') {
+  // Handle main flow options
+  if (lowerMessage === 'offert' || lowerMessage === 'begär flyttoffert') {
     setSubmissionType('offert');
     handleMoveType(context, 'offert');
     return;
   }
 
-  if (lowerMessage === 'kontorsflytt') {
-    setSubmissionType('kontorsflytt');
-    handleMoveType(context, 'kontorsflytt');
-    return;
-  }
-
-  if (lowerMessage === 'volymuppskattning') {
-    setSubmissionType('volymuppskattning');
-    handleMoveType(context, 'volymuppskattning');
-    return;
-  }
-
-  // Handle FAQ
-  if (lowerMessage.includes('fråga') || lowerMessage.includes('hjälp') || lowerMessage.includes('?')) {
-    handleFAQ(message, addMessage);
+  // Handle international moving (placeholder for future implementation)
+  if (lowerMessage === 'utomlands' || lowerMessage === 'flytt utomlands') {
+    // TODO: Implement international moving flow
+    addMessage('Flytt utomlands kommer snart! Kontakta oss direkt för internationella flyttar:', 'bot');
+    addMessage(`📞 ${SMARTFLYTT_CONFIG.COMPANY.phone}`, 'bot');
+    addMessage(`📧 ${SMARTFLYTT_CONFIG.COMPANY.email}`, 'bot');
     return;
   }
 
@@ -84,11 +75,13 @@ export const processUserMessage = async ({
       break;
 
     case 'rooms':
-      const roomsMapping: { [key: string]: '1 rok' | '2 rok' | '3 rok' | 'villa' | 'annat' } = {
-        '1': '1 rok',
-        '2': '2 rok', 
-        '3': '3 rok',
+      const roomsMapping: { [key: string]: string } = {
+        '1': '1rok',
+        '2': '2rok', 
+        '3': '3rok',
+        '4': '4rok',
         'villa': 'villa',
+        'kontor': 'kontor',
         'annat': 'annat'
       };
       const rooms = roomsMapping[lowerMessage] || 'annat';
@@ -122,20 +115,4 @@ export const processUserMessage = async ({
       addMessage('Jag förstår inte riktigt. Kan du försöka igen?', 'bot');
       break;
   }
-};
-
-const handleFAQ = (message: string, addMessage: (content: string, type: 'bot' | 'user') => void) => {
-  const lowerMessage = message.toLowerCase();
-  
-  // Find matching FAQ
-  for (const faq of faqData) {
-    if (faq.question.toLowerCase().includes(lowerMessage) || 
-        faq.answer.toLowerCase().includes(lowerMessage)) {
-      addMessage(faq.answer, 'bot');
-      return;
-    }
-  }
-  
-  // Default FAQ response
-  addMessage('Här är några vanliga frågor jag kan hjälpa med:\n\n• Vad kostar det att flytta?\n• Hur lång tid tar en flytt?\n• Vad ingår i tjänsten?\n• Hur bokar jag en flytt?\n\nFråga mig gärna något specifikt!', 'bot');
 };

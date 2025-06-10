@@ -6,6 +6,8 @@ import { ChatMessages } from './ChatMessages';
 import { ChatInput } from './ChatInput';
 import { ProgressIndicator } from './ProgressIndicator';
 import { trackFlowStep, trackFormAbandonment } from '@/utils/analytics';
+import { SMARTFLYTT_CONFIG } from '@/data/constants';
+import { ErrorBoundary } from './ErrorBoundary';
 
 export const ChatbotContainer: React.FC = () => {
   const chatbotState = useChatbotState();
@@ -29,8 +31,7 @@ export const ChatbotContainer: React.FC = () => {
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (chatbotState.state.currentStep !== 'welcome' && chatbotState.state.currentStep !== 'submitted') {
-        // Calculate completion percentage based on step order
-        const stepOrder = ['welcome', 'moveType', 'date', 'fromAddress', 'toAddress', 'rooms', 'volume', 'elevator', 'priceCalculation', 'contact', 'gdpr', 'submitted'];
+        const stepOrder = ['welcome', 'moveType', 'date', 'fromAddress', 'toAddress', 'rooms', 'volume', 'contact', 'submitted'];
         const currentIndex = stepOrder.indexOf(chatbotState.state.currentStep);
         const completionPercentage = currentIndex > 0 ? (currentIndex / (stepOrder.length - 1)) * 100 : 0;
         
@@ -43,17 +44,17 @@ export const ChatbotContainer: React.FC = () => {
   }, [chatbotState.state.currentStep]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl h-[90vh] bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-green-200/50 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 shadow-lg">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <span className="text-2xl">🚚</span>
+    <ErrorBoundary>
+      <div className="h-full flex flex-col bg-white">
+        {/* Modern Header */}
+        <div className="bg-gradient-to-r from-smartflytt-600 to-smartflytt-700 text-white p-6 shadow-lg">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+              <span className="text-2xl">{SMARTFLYTT_CONFIG.BOT.avatar}</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Smartflytt Chattbot</h1>
-              <p className="text-green-100 text-sm">Få din preliminära offert för flytt</p>
+              <h1 className="text-xl font-bold">{SMARTFLYTT_CONFIG.BOT.name}</h1>
+              <p className="text-smartflytt-100 text-sm">{SMARTFLYTT_CONFIG.COMPANY.tagline}</p>
             </div>
           </div>
         </div>
@@ -80,6 +81,6 @@ export const ChatbotContainer: React.FC = () => {
           />
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };

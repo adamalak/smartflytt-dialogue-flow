@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, Loader2 } from 'lucide-react';
 import { FlowStep } from '@/types/chatbot';
-import { CHATBOT_CONSTANTS } from '@/data/constants';
+import { SMARTFLYTT_CONFIG } from '@/data/constants';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -37,134 +37,65 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     switch (currentStep) {
       case 'welcome':
         return 'Skriv ditt meddelande...';
-      case 'moveType':
-        return 'T.ex. "bostad", "kontor" eller "annat"...';
-      case 'date':
-        return 'Ange flyttdatum (ÅÅÅÅ-MM-DD)...';
-      case 'fromAddress':
-        return 'T.ex. "Storgatan 1, 12345 Stockholm"...';
-      case 'toAddress':
-        return 'T.ex. "Nygatan 5, 54321 Göteborg"...';
-      case 'rooms':
-        return 'T.ex. "1 rok", "2 rok", "villa"...';
-      case 'volume':
-        return 'Ange antal kubikmeter (t.ex. 25)...';
-      case 'volumeCoordinator':
-        return 'Skriv "ja" eller "nej"...';
-      case 'elevator':
-        return 'T.ex. "ja båda", "nej ingen"...';
       case 'contact':
-        return 'T.ex. "Anna Svensson, anna@exempel.se"...';
-      case 'gdpr':
-        return 'Skriv "ja" för att godkänna...';
+        return 'Ange dina kontaktuppgifter...';
+      case 'additionalInfo':
+        return 'Eventuella önskemål eller kommentarer...';
       default:
         return 'Skriv ditt meddelande...';
     }
   };
 
-  // Show quick reply buttons for certain steps
-  const showQuickReplies = () => {
-    if (currentStep === 'moveType') {
+  // Show initial quick reply buttons for welcome step
+  const showInitialOptions = () => {
+    if (currentStep === 'welcome') {
       return (
-        <div className="flex flex-wrap gap-2 mb-2">
-          {CHATBOT_CONSTANTS.QUICK_REPLIES.MOVE_TYPES.map((reply) => (
+        <div className="flex flex-col gap-3 mb-4">
+          {SMARTFLYTT_CONFIG.FLOW.initialOptions.map((option) => (
             <Button
-              key={reply.value}
-              variant="outline"
-              size="sm"
-              onClick={() => onSendMessage(reply.label)}
+              key={option.value}
+              onClick={() => onSendMessage(option.label)}
               disabled={disabled}
-              className="text-xs"
+              className={`w-full h-14 text-lg rounded-xl transition-all duration-200 ${
+                option.primary
+                  ? 'bg-smartflytt-600 hover:bg-smartflytt-700 text-white shadow-lg hover:shadow-xl'
+                  : 'bg-white border-2 border-smartflytt-200 hover:bg-smartflytt-50 text-smartflytt-700 hover:border-smartflytt-300'
+              }`}
+              aria-label={option.label}
             >
-              {reply.label}
+              {option.label}
             </Button>
           ))}
         </div>
       );
     }
-
-    if (currentStep === 'rooms') {
-      return (
-        <div className="flex flex-wrap gap-2 mb-2">
-          {CHATBOT_CONSTANTS.QUICK_REPLIES.ROOM_OPTIONS.map((reply) => (
-            <Button
-              key={reply.value}
-              variant="outline"
-              size="sm"
-              onClick={() => onSendMessage(reply.label)}
-              disabled={disabled}
-              className="text-xs"
-            >
-              {reply.label}
-            </Button>
-          ))}
-        </div>
-      );
-    }
-
-    if (currentStep === 'elevator') {
-      return (
-        <div className="flex flex-wrap gap-2 mb-2">
-          {CHATBOT_CONSTANTS.QUICK_REPLIES.ELEVATOR_OPTIONS.map((reply) => (
-            <Button
-              key={reply.value}
-              variant="outline"
-              size="sm"
-              onClick={() => onSendMessage(reply.label)}
-              disabled={disabled}
-              className="text-xs"
-            >
-              {reply.label}
-            </Button>
-          ))}
-        </div>
-      );
-    }
-
-    if (currentStep === 'volumeCoordinator') {
-      return (
-        <div className="flex flex-wrap gap-2 mb-2">
-          {CHATBOT_CONSTANTS.QUICK_REPLIES.VOLUME_COORDINATOR.map((reply) => (
-            <Button
-              key={reply.value}
-              variant="outline"
-              size="sm"
-              onClick={() => onSendMessage(reply.label)}
-              disabled={disabled}
-              className="text-xs"
-            >
-              {reply.label}
-            </Button>
-          ))}
-        </div>
-      );
-    }
-
     return null;
   };
 
   return (
-    <div className="border-t p-4 bg-background">
-      {showQuickReplies()}
-      <div className="flex gap-2">
+    <div className="border-t border-smartflytt-200 p-6 bg-white">
+      {showInitialOptions()}
+      <div className="flex gap-3">
         <Input
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={getPlaceholder()}
           disabled={disabled}
-          className="flex-1"
+          className="flex-1 h-12 rounded-xl border-smartflytt-200 focus:border-smartflytt-400 focus:ring-smartflytt-400"
+          aria-label="Skriv meddelande"
         />
         <Button
           onClick={handleSend}
           disabled={disabled || !inputValue.trim()}
           size="icon"
-          className="shrink-0 bg-green-500 hover:bg-green-600"
+          className="shrink-0 w-12 h-12 bg-smartflytt-600 hover:bg-smartflytt-700 rounded-xl"
+          aria-label="Skicka meddelande"
         >
           {disabled ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
-            <Send className="w-4 h-4" />
+            <Send className="w-5 h-5" />
           )}
         </Button>
       </div>

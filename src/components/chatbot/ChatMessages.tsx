@@ -11,6 +11,7 @@ import { VolumeInput } from './VolumeInput';
 import { AdditionalInfoInput } from './AdditionalInfoInput';
 import { LoadingIndicator } from './LoadingIndicator';
 import { MessageBubble } from './MessageBubble';
+import { ThankYouPage } from './ThankYouPage';
 
 interface ChatMessagesProps {
   messages: ChatMessage[];
@@ -37,6 +38,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
   const [showVolumeInput, setShowVolumeInput] = useState(false);
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
   const [showRoomsSelection, setShowRoomsSelection] = useState(false);
+  const [formData, setFormData] = useState<any>({});
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -127,9 +129,25 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     }
   };
 
+  const handleStartOver = () => {
+    if (setCurrentStep) {
+      localStorage.removeItem('smartflytt-chat-state');
+      window.location.reload();
+    }
+  };
+
+  // Show thank you page if submitted
+  if (currentStep === 'submitted') {
+    return (
+      <div className="flex-1 flex items-center justify-center p-4">
+        <ThankYouPage formData={formData} onStartOver={handleStartOver} />
+      </div>
+    );
+  }
+
   return (
-    <ScrollArea className="flex-1 p-6 bg-gradient-to-b from-white to-green-50/30">
-      <div className="space-y-6 max-w-3xl mx-auto">
+    <ScrollArea className="flex-1 p-6 bg-gradient-to-b from-white to-smartflytt-50/30">
+      <div className="space-y-8 max-w-3xl mx-auto">
         {messages.map((message, index) => (
           <MessageBubble
             key={message.id}
