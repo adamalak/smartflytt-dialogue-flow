@@ -3,6 +3,7 @@ import { trackFlowStep, trackFormAbandonment } from '@/utils/analytics';
 import { submitForm } from '@/utils/formSubmission';
 import { handlePriceCalculationStep } from '@/utils/priceCalculationHandler';
 import { validateEmail, validatePhoneNumber } from '@/utils/validation';
+import { SMARTFLYTT_CONFIG } from '@/data/constants';
 
 export interface StepHandlerContext {
   state: ChatbotState;
@@ -104,17 +105,44 @@ export const handleDate = (context: StepContext, date: string) => {
   }, 1000);
 };
 
-export const handleRooms = (context: StepContext, rooms: '1rok' | '2rok' | '3rok' | '4rok' | 'villa' | 'kontor' | 'annat') => {
+export const handleRooms = (context: StepContext, rooms: '1 rok' | '2 rok' | '3 rok' | 'villa' | 'annat') => {
   const { state, addMessage, setCurrentStep } = context;
 
   state.formData.rooms = rooms;
   trackFlowStep('rooms', { rooms });
 
-  // Get room label from config
-  const roomOption = SMARTFLYTT_CONFIG.ROOM_OPTIONS.find(r => r.value === rooms);
-  const roomLabel = roomOption ? roomOption.label : rooms;
+  // Get room label from config - need to map from picker values to display values
+  const roomMappings: { [key: string]: string } = {
+    '1rok': '1 rum och kök',
+    '2rok': '2 rum och kök', 
+    '3rok': '3 rum och kök',
+    '4rok': '4 rum och kök',
+    'villa': 'Villa/Hus',
+    'kontor': 'Kontor',
+    'annat': 'Annat'
+  };
+  
+  // Convert picker format to display format
+  const pickerToFormData: { [key: string]: '1 rok' | '2 rok' | '3 rok' | 'villa' | 'annat' } = {
+    '1rok': '1 rok',
+    '2rok': '2 rok',
+    '3rok': '3 rok',
+    '4rok': 'villa', // Map 4rok to villa since it's not in the original type
+    'villa': 'villa',
+    'kontor': 'villa', // Map kontor to villa since it's not in the original type
+    'annat': 'annat'
+  };
 
-  addMessage(`Du har valt ${roomLabel}.`, 'bot');
+  // If rooms is coming from the picker format, convert it
+  if (typeof rooms === 'string' && rooms.includes('rok')) {
+    const mappedRoom = pickerToFormData[rooms] || 'annat';
+    state.formData.rooms = mappedRoom;
+    const displayLabel = roomMappings[rooms] || rooms;
+    addMessage(`Du har valt ${displayLabel}.`, 'bot');
+  } else {
+    addMessage(`Du har valt ${rooms}.`, 'bot');
+  }
+
   setTimeout(() => {
     addMessage('Ungefär hur många kubikmeter uppskattar du?', 'bot');
     setCurrentStep('volume');

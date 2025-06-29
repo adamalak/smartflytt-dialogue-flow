@@ -1,4 +1,3 @@
-
 import { 
   handleWelcome,
   handleMoveType,
@@ -75,18 +74,8 @@ export const processUserMessage = async ({
       break;
 
     case 'rooms':
-      // Fix: Use proper literal types for rooms
-      const roomsMapping: { [key: string]: '1rok' | '2rok' | '3rok' | '4rok' | 'villa' | 'kontor' | 'annat' } = {
-        '1rok': '1rok',
-        '2rok': '2rok', 
-        '3rok': '3rok',
-        '4rok': '4rok',
-        'villa': 'villa',
-        'kontor': 'kontor',
-        'annat': 'annat'
-      };
-      const rooms = roomsMapping[lowerMessage] || 'annat';
-      handleRooms(context, rooms);
+      // Handle rooms selection from picker - pass the raw value to handleRooms
+      handleRooms(context, lowerMessage as '1 rok' | '2 rok' | '3 rok' | 'villa' | 'annat');
       break;
 
     case 'volume':
