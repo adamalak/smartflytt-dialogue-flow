@@ -173,10 +173,10 @@ export const handleAdditionalInfo = (context: StepContext, additionalInfo: strin
   state.formData.additionalInfo = additionalInfo;
   trackFlowStep('additionalInfo', { additionalInfo });
 
-  addMessage('Tack! Då har jag all information jag behöver.', 'bot');
+  addMessage('Tack! Nu har jag all information jag behöver.', 'bot');
   setTimeout(() => {
-    addMessage('Slutligen, hur kan jag kontakta dig?', 'bot');
-    setCurrentStep('contact');
+    addMessage('Låt mig visa en sammanfattning av din förfrågan så du kan kontrollera att allt stämmer.', 'bot');
+    setCurrentStep('summary');
   }, 1000);
 };
 
@@ -203,13 +203,21 @@ export const handleContact = async (context: StepHandlerContext, contactInfo: an
 
   addMessage(`Tack ${contactInfo.name}!`, 'bot');
 
-  await handlePriceCalculationStep(state.formData, {
-    addMessage,
-    setCurrentStep,
-    updateFormData,
-    setLoading,
-    state
-  });
+  // Check if we should calculate price or go straight to additional info
+  if (state.formData.from && state.formData.to && state.formData.volume) {
+    await handlePriceCalculationStep(state.formData, {
+      addMessage,
+      setCurrentStep,
+      updateFormData,
+      setLoading,
+      state
+    });
+  } else {
+    setTimeout(() => {
+      addMessage('Har du några speciella önskemål eller kommentarer?', 'bot');
+      setCurrentStep('additionalInfo');
+    }, 1000);
+  }
 };
 
 export const handlePriceCalculation = (context: StepContext, priceCalculation: any) => {

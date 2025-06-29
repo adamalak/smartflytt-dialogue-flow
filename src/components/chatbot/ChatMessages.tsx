@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { ChatMessage } from '@/types/chatbot';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -13,6 +12,7 @@ import { AdditionalInfoInput } from './AdditionalInfoInput';
 import { LoadingIndicator } from './LoadingIndicator';
 import { MessageBubble } from './MessageBubble';
 import { ThankYouPage } from './ThankYouPage';
+import { PreviewSummaryPage } from './PreviewSummaryPage';
 
 interface ChatMessagesProps {
   messages: ChatMessage[];
@@ -40,6 +40,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
   const [showRoomsSelection, setShowRoomsSelection] = useState(false);
   const [showContactInputs, setShowContactInputs] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [formData, setFormData] = useState<any>({});
 
   const scrollToBottom = () => {
@@ -58,6 +59,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     setShowAdditionalInfo(false);
     setShowRoomsSelection(false);
     setShowContactInputs(false);
+    setShowPreview(false);
 
     // Show appropriate UI based on current step
     if (currentStep === 'date') {
@@ -74,6 +76,8 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
       setShowContactInputs(true);
     } else if (currentStep === 'additionalInfo') {
       setShowAdditionalInfo(true);
+    } else if (currentStep === 'summary') {
+      setShowPreview(true);
     }
   }, [currentStep]);
 
@@ -145,6 +149,22 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     }
   };
 
+  const handlePreviewEdit = (step: string) => {
+    if (setCurrentStep) {
+      setCurrentStep(step);
+    }
+  };
+
+  const handlePreviewConfirm = () => {
+    if (addMessage && setCurrentStep) {
+      addMessage('Tack! Jag skickar nu ditt ärende...', 'bot');
+      // The form submission will be handled by the dialog manager
+      if (onQuickReply) {
+        onQuickReply('confirm_submission');
+      }
+    }
+  };
+
   const handleStartOver = () => {
     if (setCurrentStep) {
       localStorage.removeItem('smartflytt-chat-state');
@@ -157,6 +177,20 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     return (
       <div className="flex-1 flex items-center justify-center p-4">
         <ThankYouPage formData={formData} onStartOver={handleStartOver} />
+      </div>
+    );
+  }
+
+  // Show preview/summary page
+  if (showPreview && currentStep === 'summary') {
+    return (
+      <div className="flex-1 flex items-center justify-center p-4">
+        <PreviewSummaryPage 
+          formData={formData}
+          onEdit={handlePreviewEdit}
+          onConfirm={handlePreviewConfirm}
+          isLoading={isLoading}
+        />
       </div>
     );
   }

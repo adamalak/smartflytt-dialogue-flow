@@ -47,6 +47,13 @@ export const processUserMessage = async ({
     updateFormData
   };
 
+  // Handle summary confirmation
+  if (lowerMessage === 'confirm_submission' && state.currentStep === 'summary') {
+    const { submitForm } = await import('./formSubmission');
+    await submitForm(context);
+    return;
+  }
+
   // Handle main flow options
   if (lowerMessage === 'offert' || lowerMessage === 'begär flyttoffert') {
     setSubmissionType('offert');
