@@ -25,34 +25,7 @@ const stepOrder: FlowStep[] = [
   'submitted'
 ];
 
-export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ currentStep }) => {
-  const currentStepIndex = stepOrder.indexOf(currentStep);
-  const totalSteps = stepOrder.length - 2; // Exclude welcome and submitted from total
-  const progressPercentage = currentStepIndex <= 0 ? 0 : Math.min(((currentStepIndex - 1) / (totalSteps - 1)) * 100, 100);
-
-  if (currentStep === 'welcome' || currentStep === 'faq' || currentStep === 'services') {
-    return null;
-  }
-
-  return (
-    <div className="p-4 border-b bg-gradient-to-r from-green-50 to-emerald-50 border-green-200/50">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-semibold text-green-700">
-          Förlopp
-        </span>
-        <span className="text-sm font-semibold text-green-600">
-          {Math.max(0, currentStepIndex - 1)}/{totalSteps - 1}
-        </span>
-      </div>
-      <Progress value={progressPercentage} className="h-2 bg-green-100" />
-      <p className="text-xs text-green-600 mt-2 font-medium">
-        {getStepDescription(currentStep)}
-      </p>
-    </div>
-  );
-};
-
-const getStepDescription = (step: FlowStep): string => {
+const getStepLabel = (step: FlowStep): string => {
   switch (step) {
     case 'moveType':
       return 'Typ av flytt';
@@ -85,4 +58,69 @@ const getStepDescription = (step: FlowStep): string => {
     default:
       return '';
   }
+};
+
+export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ currentStep }) => {
+  const currentStepIndex = stepOrder.indexOf(currentStep);
+  const totalSteps = stepOrder.length - 2; // Exclude welcome and submitted from total
+  const progressPercentage = currentStepIndex <= 0 ? 0 : Math.min(((currentStepIndex - 1) / (totalSteps - 1)) * 100, 100);
+  const currentStepNumber = Math.max(0, currentStepIndex - 1);
+
+  // Don't show for welcome, FAQ, or services pages
+  if (currentStep === 'welcome' || currentStep === 'faq' || currentStep === 'services') {
+    return null;
+  }
+
+  return (
+    <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-smartflytt-200/50 shadow-sm">
+      <div className="px-4 py-4">
+        {/* Step indicators */}
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-lg font-semibold text-smartflytt-700">
+            Förlopp
+          </span>
+          <span className="text-lg font-bold text-smartflytt-600">
+            {currentStepNumber}/{totalSteps - 1}
+          </span>
+        </div>
+
+        {/* Progress bar with glassmorphic styling */}
+        <div className="relative">
+          <Progress 
+            value={progressPercentage} 
+            className="h-3 bg-smartflytt-100 rounded-full overflow-hidden shadow-inner"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full pointer-events-none"></div>
+        </div>
+
+        {/* Current step description */}
+        <div className="mt-3 flex items-center justify-center">
+          <p className="text-sm font-medium text-smartflytt-600 text-center">
+            {getStepLabel(currentStep)}
+          </p>
+        </div>
+
+        {/* Step dots visualization */}
+        <div className="flex justify-center mt-2 space-x-2">
+          {stepOrder.slice(1, -1).map((step, index) => {
+            const isCompleted = index < currentStepNumber;
+            const isCurrent = index === currentStepNumber;
+            
+            return (
+              <div
+                key={step}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  isCompleted 
+                    ? 'bg-smartflytt-600 scale-110 shadow-sm' 
+                    : isCurrent 
+                    ? 'bg-smartflytt-400 scale-125 ring-2 ring-smartflytt-200' 
+                    : 'bg-smartflytt-200'
+                }`}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 };

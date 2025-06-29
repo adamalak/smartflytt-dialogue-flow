@@ -1,20 +1,44 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useChatbotState } from '@/hooks/useChatbotState';
 import { DialogManager } from './DialogManager';
 import { ChatMessages } from './ChatMessages';
 import { ChatInput } from './ChatInput';
 import { ProgressIndicator } from './ProgressIndicator';
+import { OnboardingScreen } from './OnboardingScreen';
 import { trackFlowStep, trackFormAbandonment } from '@/utils/analytics';
 import { SMARTFLYTT_CONFIG } from '@/data/constants';
 import { ErrorBoundary } from './ErrorBoundary';
 
 export const ChatbotContainer: React.FC = () => {
   const chatbotState = useChatbotState();
+  const [showOnboarding, setShowOnboarding] = useState(true);
 
   const handleSendMessage = (message: string) => {
     chatbotState.addMessage(message, 'user');
   };
+
+  const handleStartQuote = () => {
+    setShowOnboarding(false);
+    chatbotState.setSubmissionType('offert');
+    chatbotState.addMessage('Välkommen! Låt oss hjälpa dig med din flyttoffert.', 'bot');
+    chatbotState.addMessage('Vad för typ av flytt handlar det om?', 'bot');
+    chatbotState.setCurrentStep('moveType');
+  };
+
+  const handleInternationalMove = () => {
+    setShowOnboarding(false);
+    chatbotState.addMessage('Flytt utomlands kommer snart! Kontakta oss direkt för internationella flyttar:', 'bot');
+    chatbotState.addMessage(`📞 ${SMARTFLYTT_CONFIG.COMPANY.phone}`, 'bot');
+    chatbotState.addMessage(`📧 ${SMARTFLYTT_CONFIG.COMPANY.email}`, 'bot');
+  };
+
+  // Check if user has already started the flow
+  useEffect(() => {
+    if (chatbotState.state.currentStep !== 'welcome' || chatbotState.state.messages.length > 0) {
+      setShowOnboarding(false);
+    }
+  }, [chatbotState.state.currentStep, chatbotState.state.messages.length]);
 
   // Track flow step changes
   useEffect(() => {
@@ -43,9 +67,21 @@ export const ChatbotContainer: React.FC = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [chatbotState.state.currentStep]);
 
+  // Show onboarding screen
+  if (showOnboarding) {
+    return (
+      <ErrorBoundary>
+        <OnboardingScreen 
+          onStartQuote={handleStartQuote}
+          onInternationalMove={handleInternationalMove}
+        />
+      </ErrorBoundary>
+    );
+  }
+
   return (
     <ErrorBoundary>
-      <div className="h-full flex flex-col bg-white">
+      <div className="h-full flex flex-col bg-white/98 backdrop-blur-sm">
         {/* Modern Header */}
         <div className="bg-gradient-to-r from-smartflytt-600 to-smartflytt-700 text-white p-6 shadow-lg">
           <div className="flex items-center space-x-4">
