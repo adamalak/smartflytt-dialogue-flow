@@ -56,10 +56,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               key={option.value}
               onClick={() => onSendMessage(option.label)}
               disabled={disabled}
-              className={`w-full h-14 text-lg rounded-xl transition-all duration-200 ${
+              className={`w-full min-h-11 text-lg rounded-xl transition-all duration-200 touch-target ${
                 option.primary
-                  ? 'bg-smartflytt-600 hover:bg-smartflytt-700 text-white shadow-lg hover:shadow-xl'
-                  : 'bg-white border-2 border-smartflytt-200 hover:bg-smartflytt-50 text-smartflytt-700 hover:border-smartflytt-300'
+                  ? 'bg-smartflytt-600 hover:bg-smartflytt-700 text-white shadow-lg hover:shadow-xl hover:scale-[1.02]'
+                  : 'bg-white border-2 border-smartflytt-200 hover:bg-smartflytt-50 text-smartflytt-700 hover:border-smartflytt-300 hover:scale-[1.02]'
               }`}
               aria-label={option.label}
             >
@@ -82,14 +82,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           onKeyPress={handleKeyPress}
           placeholder={getPlaceholder()}
           disabled={disabled}
-          className="flex-1 h-12 rounded-xl border-smartflytt-200 focus:border-smartflytt-400 focus:ring-smartflytt-400"
+          className="flex-1 min-h-11 text-lg rounded-xl border-smartflytt-200 focus:border-smartflytt-400 focus:ring-smartflytt-400 px-5 py-3"
           aria-label="Skriv meddelande"
         />
         <Button
           onClick={handleSend}
           disabled={disabled || !inputValue.trim()}
           size="icon"
-          className="shrink-0 w-12 h-12 bg-smartflytt-600 hover:bg-smartflytt-700 rounded-xl"
+          className="shrink-0 min-w-11 min-h-11 bg-smartflytt-600 hover:bg-smartflytt-700 rounded-xl transition-all duration-200 hover:scale-105 touch-target"
           aria-label="Skicka meddelande"
         >
           {disabled ? (

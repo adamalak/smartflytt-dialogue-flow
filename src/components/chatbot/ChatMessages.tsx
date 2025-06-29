@@ -2,12 +2,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChatMessage } from '@/types/chatbot';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { DatePicker } from './DatePicker';
-import { AddressInput } from './AddressInput';
+import { EnhancedDatePicker } from './EnhancedDatePicker';
+import { AutocompleteAddressInput } from './AutocompleteAddressInput';
 import { Address } from '@/types/chatbot';
 import { handleFromAddressSubmission, handleToAddressSubmission } from '@/utils/addressHandlers';
-import { RoomsSelection } from './RoomsSelection';
-import { VolumeInput } from './VolumeInput';
+import { ModernRoomSelector } from './ModernRoomSelector';
+import { VolumeSlider } from './VolumeSlider';
+import { ContactInputs } from './ContactInputs';
 import { AdditionalInfoInput } from './AdditionalInfoInput';
 import { LoadingIndicator } from './LoadingIndicator';
 import { MessageBubble } from './MessageBubble';
@@ -38,6 +39,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
   const [showVolumeInput, setShowVolumeInput] = useState(false);
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
   const [showRoomsSelection, setShowRoomsSelection] = useState(false);
+  const [showContactInputs, setShowContactInputs] = useState(false);
   const [formData, setFormData] = useState<any>({});
 
   const scrollToBottom = () => {
@@ -55,6 +57,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     setShowVolumeInput(false);
     setShowAdditionalInfo(false);
     setShowRoomsSelection(false);
+    setShowContactInputs(false);
 
     // Show appropriate UI based on current step
     if (currentStep === 'date') {
@@ -67,6 +70,8 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
       setShowRoomsSelection(true);
     } else if (currentStep === 'volume') {
       setShowVolumeInput(true);
+    } else if (currentStep === 'contact') {
+      setShowContactInputs(true);
     } else if (currentStep === 'additionalInfo') {
       setShowAdditionalInfo(true);
     }
@@ -78,10 +83,14 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     }
   };
 
-  const handleDateSelect = (date: Date | undefined) => {
-    if (date && onQuickReply) {
-      const formattedDate = date.toISOString().split('T')[0];
-      onQuickReply(formattedDate);
+  const handleDateSelect = (dateOrOption: Date | string) => {
+    if (onQuickReply) {
+      if (typeof dateOrOption === 'string') {
+        onQuickReply(dateOrOption);
+      } else {
+        const formattedDate = dateOrOption.toISOString().split('T')[0];
+        onQuickReply(formattedDate);
+      }
       setShowDatePicker(false);
     }
   };
@@ -108,10 +117,17 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
     setShowAddressInput(null);
   };
 
-  const handleVolumeSubmit = (volume: string) => {
-    if (onQuickReply && volume.trim()) {
-      onQuickReply(volume);
+  const handleVolumeSubmit = (volume: number | string) => {
+    if (onQuickReply) {
+      onQuickReply(volume.toString());
       setShowVolumeInput(false);
+    }
+  };
+
+  const handleContactSubmit = (contactData: { name: string; phone: string; email: string }) => {
+    if (onQuickReply) {
+      onQuickReply(`${contactData.name}, ${contactData.phone}, ${contactData.email}`);
+      setShowContactInputs(false);
     }
   };
 
@@ -157,13 +173,13 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
           />
         ))}
 
-        {/* Interactive Components */}
+        {/* Enhanced Interactive Components */}
         {showDatePicker && (
           <div className="flex justify-center">
             <div className="w-full max-w-md">
-              <DatePicker
-                date={undefined}
-                onDateChange={handleDateSelect}
+              <EnhancedDatePicker
+                onDateSelect={handleDateSelect}
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -172,22 +188,46 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
         {showAddressInput && (
           <div className="flex justify-center">
             <div className="w-full max-w-md">
-              <AddressInput
-                address={{}}
-                onAddressChange={handleAddressSubmit}
-                onSubmit={() => {}}
+              <AutocompleteAddressInput
+                onAddressSelect={handleAddressSubmit}
                 title={showAddressInput === 'from' ? 'Från-adress' : 'Till-adress'}
+                disabled={isLoading}
               />
             </div>
           </div>
         )}
 
         {showRoomsSelection && (
-          <RoomsSelection onSelect={handleRoomSelection} />
+          <div className="flex justify-center">
+            <div className="w-full max-w-md">
+              <ModernRoomSelector 
+                onRoomSelect={handleRoomSelection}
+                disabled={isLoading}
+              />
+            </div>
+          </div>
         )}
 
         {showVolumeInput && (
-          <VolumeInput onSubmit={handleVolumeSubmit} />
+          <div className="flex justify-center">
+            <div className="w-full max-w-md">
+              <VolumeSlider 
+                onVolumeSelect={handleVolumeSubmit}
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+        )}
+
+        {showContactInputs && (
+          <div className="flex justify-center">
+            <div className="w-full max-w-md">
+              <ContactInputs 
+                onContactSubmit={handleContactSubmit}
+                disabled={isLoading}
+              />
+            </div>
+          </div>
         )}
 
         {showAdditionalInfo && (
