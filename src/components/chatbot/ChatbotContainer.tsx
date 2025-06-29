@@ -6,6 +6,8 @@ import { ChatMessages } from './ChatMessages';
 import { ChatInput } from './ChatInput';
 import { ProgressIndicator } from './ProgressIndicator';
 import { OnboardingScreen } from './OnboardingScreen';
+import { BackButton } from './BackButton';
+import { ValidationProvider } from '@/contexts/ValidationContext';
 import { trackFlowStep, trackFormAbandonment } from '@/utils/analytics';
 import { SMARTFLYTT_CONFIG } from '@/data/constants';
 import { ErrorBoundary } from './ErrorBoundary';
@@ -81,42 +83,57 @@ export const ChatbotContainer: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div className="h-full flex flex-col bg-white/98 backdrop-blur-sm">
-        {/* Modern Header */}
-        <div className="bg-gradient-to-r from-smartflytt-600 to-smartflytt-700 text-white p-6 shadow-lg">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-              <span className="text-2xl">{SMARTFLYTT_CONFIG.BOT.avatar}</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">{SMARTFLYTT_CONFIG.BOT.name}</h1>
-              <p className="text-smartflytt-100 text-sm">{SMARTFLYTT_CONFIG.COMPANY.tagline}</p>
+      <ValidationProvider>
+        <div className="h-full flex flex-col bg-white/98 backdrop-blur-sm">
+          {/* Modern Header with Back Button */}
+          <div className="sticky top-0 z-50 bg-gradient-to-r from-smartflytt-600 to-smartflytt-700 text-white shadow-lg">
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                    <span className="text-2xl">{SMARTFLYTT_CONFIG.BOT.avatar}</span>
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold">{SMARTFLYTT_CONFIG.BOT.name}</h1>
+                    <p className="text-smartflytt-100 text-sm">{SMARTFLYTT_CONFIG.COMPANY.tagline}</p>
+                  </div>
+                </div>
+                
+                {/* Back Button */}
+                {chatbotState.canGoBack() && (
+                  <BackButton 
+                    onGoBack={chatbotState.goBackOneStep}
+                    disabled={chatbotState.state.isLoading}
+                    className="text-white hover:text-smartflytt-100 hover:bg-white/10"
+                  />
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        <ProgressIndicator currentStep={chatbotState.state.currentStep} />
-        
-        <div className="flex-1 flex flex-col min-h-0">
-          <ChatMessages 
-            messages={chatbotState.state.messages}
-            isLoading={chatbotState.state.isLoading}
-            onQuickReply={handleSendMessage}
-            currentStep={chatbotState.state.currentStep}
-            addMessage={chatbotState.addMessage}
-            setCurrentStep={chatbotState.setCurrentStep}
-            updateFormData={chatbotState.updateFormData}
-          />
+          <ProgressIndicator currentStep={chatbotState.state.currentStep} />
           
-          <DialogManager {...chatbotState} />
-          
-          <ChatInput 
-            onSendMessage={handleSendMessage}
-            disabled={chatbotState.state.isLoading}
-            currentStep={chatbotState.state.currentStep}
-          />
+          <div className="flex-1 flex flex-col min-h-0">
+            <ChatMessages 
+              messages={chatbotState.state.messages}
+              isLoading={chatbotState.state.isLoading}
+              onQuickReply={handleSendMessage}
+              currentStep={chatbotState.state.currentStep}
+              addMessage={chatbotState.addMessage}
+              setCurrentStep={chatbotState.setCurrentStep}
+              updateFormData={chatbotState.updateFormData}
+            />
+            
+            <DialogManager {...chatbotState} />
+            
+            <ChatInput 
+              onSendMessage={handleSendMessage}
+              disabled={chatbotState.state.isLoading}
+              currentStep={chatbotState.state.currentStep}
+            />
+          </div>
         </div>
-      </div>
+      </ValidationProvider>
     </ErrorBoundary>
   );
 };
