@@ -9,7 +9,7 @@ import { ModernRoomSelector } from './ModernRoomSelector';
 import { VolumeSlider } from './VolumeSlider';
 import { ContactInputs } from './ContactInputs';
 import { AdditionalInfoInput } from './AdditionalInfoInput';
-import { LoadingIndicator } from './LoadingIndicator';
+import { EnhancedLoadingIndicator } from './EnhancedLoadingIndicator';
 import { MessageBubble } from './MessageBubble';
 import { ThankYouPage } from './ThankYouPage';
 import { PreviewSummaryPage } from './PreviewSummaryPage';
@@ -196,20 +196,22 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
   }
 
   return (
-    <ScrollArea className="flex-1 p-6 bg-gradient-to-b from-white to-smartflytt-50/30">
+    <ScrollArea className="flex-1 p-6 bg-gradient-to-br from-smartflytt-50/80 via-white/90 to-indigo-50/80 dark:from-gray-900/90 dark:via-gray-800/90 dark:to-gray-900/90">
       <div className="space-y-8 max-w-3xl mx-auto">
-        {messages.map((message, index) => (
-          <MessageBubble
-            key={message.id}
-            message={message}
-            isLast={index === messages.length - 1}
-            onQuickReply={handleQuickReply}
-          />
-        ))}
+        <div role="list" className="space-y-6">
+          {messages.map((message, index) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              isLast={index === messages.length - 1}
+              onQuickReply={handleQuickReply}
+            />
+          ))}
+        </div>
 
         {/* Enhanced Interactive Components */}
         {showDatePicker && (
-          <div className="flex justify-center">
+          <div className="flex justify-center animate-fade-in">
             <div className="w-full max-w-md">
               <EnhancedDatePicker
                 onDateSelect={handleDateSelect}
@@ -220,7 +222,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
         )}
 
         {showAddressInput && (
-          <div className="flex justify-center">
+          <div className="flex justify-center animate-fade-in">
             <div className="w-full max-w-md">
               <AutocompleteAddressInput
                 onAddressSelect={handleAddressSubmit}
@@ -232,7 +234,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
         )}
 
         {showRoomsSelection && (
-          <div className="flex justify-center">
+          <div className="flex justify-center animate-fade-in">
             <div className="w-full max-w-md">
               <ModernRoomSelector 
                 onRoomSelect={handleRoomSelection}
@@ -243,7 +245,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
         )}
 
         {showVolumeInput && (
-          <div className="flex justify-center">
+          <div className="flex justify-center animate-fade-in">
             <div className="w-full max-w-md">
               <VolumeSlider 
                 onVolumeSelect={handleVolumeSubmit}
@@ -254,7 +256,7 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
         )}
 
         {showContactInputs && (
-          <div className="flex justify-center">
+          <div className="flex justify-center animate-fade-in">
             <div className="w-full max-w-md">
               <ContactInputs 
                 onContactSubmit={handleContactSubmit}
@@ -265,10 +267,12 @@ export const ChatMessages: React.FC<ChatMessagesProps> = ({
         )}
 
         {showAdditionalInfo && (
-          <AdditionalInfoInput onSubmit={handleAdditionalInfoSubmit} />
+          <div className="animate-fade-in">
+            <AdditionalInfoInput onSubmit={handleAdditionalInfoSubmit} />
+          </div>
         )}
         
-        {isLoading && <LoadingIndicator />}
+        {isLoading && <EnhancedLoadingIndicator />}
         
         <div ref={messagesEndRef} />
       </div>

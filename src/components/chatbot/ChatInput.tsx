@@ -50,16 +50,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const showInitialOptions = () => {
     if (currentStep === 'welcome') {
       return (
-        <div className="flex flex-col gap-3 mb-4">
+        <div className="flex flex-col gap-3 mb-4" role="group" aria-label="Välj tjänst">
           {SMARTFLYTT_CONFIG.FLOW.initialOptions.map((option) => (
             <Button
               key={option.value}
               onClick={() => onSendMessage(option.label)}
               disabled={disabled}
-              className={`w-full min-h-11 text-lg rounded-xl transition-all duration-200 touch-target ${
+              className={`w-full min-h-12 text-lg rounded-2xl transition-all duration-300 touch-target font-semibold ${
                 option.primary
-                  ? 'bg-smartflytt-600 hover:bg-smartflytt-700 text-white shadow-lg hover:shadow-xl hover:scale-[1.02]'
-                  : 'bg-white border-2 border-smartflytt-200 hover:bg-smartflytt-50 text-smartflytt-700 hover:border-smartflytt-300 hover:scale-[1.02]'
+                  ? 'btn-gradient-primary text-white shadow-lg hover:shadow-xl focus:shadow-xl'
+                  : 'glass-card glass-dark text-smartflytt-700 dark:text-smartflytt-300 hover:bg-white/80 dark:hover:bg-gray-800/80 border border-smartflytt-200/50 dark:border-gray-600/50'
               }`}
               aria-label={option.label}
             >
@@ -73,7 +73,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   return (
-    <div className="border-t border-smartflytt-200 p-6 bg-white">
+    <div className="glass border-t border-smartflytt-200/50 dark:border-gray-700/50 p-6">
       {showInitialOptions()}
       <div className="flex gap-3">
         <Input
@@ -82,20 +82,20 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           onKeyPress={handleKeyPress}
           placeholder={getPlaceholder()}
           disabled={disabled}
-          className="flex-1 min-h-11 text-lg rounded-xl border-smartflytt-200 focus:border-smartflytt-400 focus:ring-smartflytt-400 px-5 py-3"
+          className="flex-1 min-h-12 text-lg rounded-2xl glass-card border-smartflytt-200/50 dark:border-gray-600/50 focus:border-smartflytt-400 focus:ring-smartflytt-400 px-5 py-3 font-medium"
           aria-label="Skriv meddelande"
         />
         <Button
           onClick={handleSend}
           disabled={disabled || !inputValue.trim()}
           size="icon"
-          className="shrink-0 min-w-11 min-h-11 bg-smartflytt-600 hover:bg-smartflytt-700 rounded-xl transition-all duration-200 hover:scale-105 touch-target"
+          className="shrink-0 min-w-12 min-h-12 btn-gradient-primary rounded-2xl transition-all duration-300 hover:shadow-lg touch-target"
           aria-label="Skicka meddelande"
         >
           {disabled ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader2 className="w-6 h-6 animate-spin" aria-hidden="true" />
           ) : (
-            <Send className="w-5 h-5" />
+            <Send className="w-6 h-6" aria-hidden="true" />
           )}
         </Button>
       </div>

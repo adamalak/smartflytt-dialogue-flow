@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,6 +19,15 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Inter', 'system-ui', 'sans-serif'],
+				inter: ['Inter', 'system-ui', 'sans-serif']
+			},
+			fontSize: {
+				base: ['18px', '1.6'],
+				lg: ['20px', '1.7'],
+				xl: ['22px', '1.8']
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -84,11 +94,77 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'slide-in-up': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(20px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'bounce-subtle': {
+					'0%, 20%, 50%, 80%, 100%': {
+						transform: 'translateY(0)'
+					},
+					'40%': {
+						transform: 'translateY(-4px)'
+					},
+					'60%': {
+						transform: 'translateY(-2px)'
+					}
+				},
+				'shimmer': {
+					'0%': {
+						backgroundPosition: '-200px 0'
+					},
+					'100%': {
+						backgroundPosition: 'calc(200px + 100%) 0'
+					}
+				},
+				'confetti': {
+					'0%': {
+						transform: 'scale(0) rotate(0deg)',
+						opacity: '1'
+					},
+					'100%': {
+						transform: 'scale(1) rotate(360deg)',
+						opacity: '0'
+					}
+				},
+				'typing': {
+					'0%, 60%': {
+						opacity: '1'
+					},
+					'30%': {
+						opacity: '0.5'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.5s ease-out',
+				'slide-in-up': 'slide-in-up 0.4s ease-out',
+				'bounce-subtle': 'bounce-subtle 1s ease-in-out',
+				'shimmer': 'shimmer 2s linear infinite',
+				'confetti': 'confetti 3s ease-out infinite',
+				'typing': 'typing 1.5s ease-in-out infinite'
+			},
+			backdropBlur: {
+				xs: '2px'
 			}
 		}
 	},

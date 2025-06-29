@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Star, Smile, Meh, Frown, ThumbsUp, Send } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import { ConfettiAnimation } from './ConfettiAnimation';
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -46,38 +47,64 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
   if (submitted) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <Card className="w-full max-w-md rounded-3xl shadow-2xl bg-white/95 backdrop-blur">
-          <CardContent className="p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <ThumbsUp className="w-8 h-8 text-green-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Tack för din feedback!</h3>
-            <p className="text-gray-600">Din åsikt hjälper oss att bli bättre.</p>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <ConfettiAnimation trigger={true} duration={2000} />
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="thank-you-title"
+        >
+          <Card className="w-full max-w-md glass-card shadow-2xl animate-scale-in">
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ThumbsUp className="w-8 h-8 text-white" aria-hidden="true" />
+              </div>
+              <h3 id="thank-you-title" className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                Tack för din feedback!
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 text-base">
+                Din åsikt hjälper oss att bli bättre.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-md rounded-3xl shadow-2xl bg-white/95 backdrop-blur">
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="feedback-title"
+    >
+      <Card className="w-full max-w-md glass-card shadow-2xl animate-scale-in">
         <CardHeader className="text-center pb-4">
-          <CardTitle className="text-xl">Hur var din upplevelse?</CardTitle>
-          <p className="text-gray-600 text-sm">Hjälp oss att förbättra vår tjänst</p>
+          <CardTitle id="feedback-title" className="text-xl font-bold">
+            Hur var din upplevelse?
+          </CardTitle>
+          <p className="text-gray-600 dark:text-gray-400 text-base">
+            Hjälp oss att förbättra vår tjänst
+          </p>
         </CardHeader>
         
         <CardContent className="space-y-6">
           {/* Star Rating */}
           <div className="text-center space-y-3">
-            <p className="text-sm font-medium text-gray-700">Betygsätt din upplevelse:</p>
-            <div className="flex justify-center space-x-2">
+            <p className="text-base font-semibold text-gray-700 dark:text-gray-300">
+              Betygsätt din upplevelse:
+            </p>
+            <div className="flex justify-center space-x-2" role="radiogroup" aria-label="Betyg från 1 till 5 stjärnor">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
                   onClick={() => setRating(star)}
-                  className="p-1 hover:scale-110 transition-all duration-200"
+                  className="p-2 hover:scale-110 transition-all duration-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-smartflytt-600 touch-target"
+                  role="radio"
+                  aria-checked={rating === star}
+                  aria-label={`${star} stjärnor`}
                 >
                   <Star
                     className={`w-8 h-8 ${
@@ -85,13 +112,14 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                         ? 'fill-yellow-400 text-yellow-400'
                         : 'text-gray-300 hover:text-yellow-200'
                     }`}
+                    aria-hidden="true"
                   />
                 </button>
               ))}
             </div>
             
             {/* Rating Labels */}
-            <div className="flex justify-between text-xs text-gray-500 px-2">
+            <div className="flex justify-between text-base text-gray-500 dark:text-gray-400 px-2">
               <span>Dålig</span>
               <span>Utmärkt</span>
             </div>
@@ -99,31 +127,36 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
           {/* Emoji Feedback */}
           <div className="text-center space-y-3">
-            <p className="text-sm font-medium text-gray-700">Eller välj känsla:</p>
-            <div className="flex justify-center space-x-4">
+            <p className="text-base font-semibold text-gray-700 dark:text-gray-300">
+              Eller välj känsla:
+            </p>
+            <div className="flex justify-center space-x-4" role="group" aria-label="Välj känsla med emoji">
               <button
                 onClick={() => setRating(2)}
-                className={`p-3 rounded-full transition-all duration-200 ${
-                  rating === 2 ? 'bg-red-100 scale-110' : 'hover:bg-gray-100'
+                className={`p-3 rounded-full transition-all duration-200 touch-target focus:outline-none focus:ring-2 focus:ring-smartflytt-600 ${
+                  rating === 2 ? 'bg-red-100 dark:bg-red-900/30 scale-110' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
+                aria-label="Besviken - 2 stjärnor"
               >
-                <Frown className="w-6 h-6 text-red-500" />
+                <Frown className="w-6 h-6 text-red-500" aria-hidden="true" />
               </button>
               <button
                 onClick={() => setRating(3)}
-                className={`p-3 rounded-full transition-all duration-200 ${
-                  rating === 3 ? 'bg-yellow-100 scale-110' : 'hover:bg-gray-100'
+                className={`p-3 rounded-full transition-all duration-200 touch-target focus:outline-none focus:ring-2 focus:ring-smartflytt-600 ${
+                  rating === 3 ? 'bg-yellow-100 dark:bg-yellow-900/30 scale-110' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
+                aria-label="Okej - 3 stjärnor"
               >
-                <Meh className="w-6 h-6 text-yellow-500" />
+                <Meh className="w-6 h-6 text-yellow-500" aria-hidden="true" />
               </button>
               <button
                 onClick={() => setRating(5)}
-                className={`p-3 rounded-full transition-all duration-200 ${
-                  rating === 5 ? 'bg-green-100 scale-110' : 'hover:bg-gray-100'
+                className={`p-3 rounded-full transition-all duration-200 touch-target focus:outline-none focus:ring-2 focus:ring-smartflytt-600 ${
+                  rating === 5 ? 'bg-green-100 dark:bg-green-900/30 scale-110' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
+                aria-label="Mycket nöjd - 5 stjärnor"
               >
-                <Smile className="w-6 h-6 text-green-500" />
+                <Smile className="w-6 h-6 text-green-500" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -131,14 +164,15 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
           {/* Optional Comment */}
           {rating > 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label htmlFor="feedback-comment" className="text-base font-semibold text-gray-700 dark:text-gray-300">
                 Vill du lägga till en kommentar? (valfritt)
               </label>
               <Textarea
+                id="feedback-comment"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Berätta gärna mer om din upplevelse..."
-                className="rounded-xl border-gray-200 focus:border-smartflytt-400 focus:ring-smartflytt-400"
+                className="rounded-2xl border-smartflytt-200 dark:border-gray-600 focus:border-smartflytt-400 focus:ring-smartflytt-400 glass-card text-base"
                 rows={3}
               />
             </div>
@@ -149,16 +183,16 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
             <Button
               variant="outline"
               onClick={handleSkip}
-              className="flex-1 rounded-xl"
+              className="flex-1 rounded-2xl glass-button border-smartflytt-200 dark:border-gray-600 text-base font-semibold touch-target"
             >
               Hoppa över
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={rating === 0}
-              className="flex-1 bg-smartflytt-600 hover:bg-smartflytt-700 rounded-xl"
+              className="flex-1 btn-gradient-primary rounded-2xl text-base font-semibold touch-target"
             >
-              <Send className="w-4 h-4 mr-2" />
+              <Send className="w-4 h-4 mr-2" aria-hidden="true" />
               Skicka
             </Button>
           </div>

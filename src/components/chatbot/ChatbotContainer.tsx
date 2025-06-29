@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useChatbotState } from '@/hooks/useChatbotState';
 import { DialogManager } from './DialogManager';
@@ -7,6 +6,7 @@ import { ChatInput } from './ChatInput';
 import { ProgressIndicator } from './ProgressIndicator';
 import { OnboardingScreen } from './OnboardingScreen';
 import { BackButton } from './BackButton';
+import { BotAvatar } from './BotAvatar';
 import { ValidationProvider } from '@/contexts/ValidationContext';
 import { trackFlowStep, trackFormAbandonment } from '@/utils/analytics';
 import { SMARTFLYTT_CONFIG } from '@/data/constants';
@@ -84,27 +84,33 @@ export const ChatbotContainer: React.FC = () => {
   return (
     <ErrorBoundary>
       <ValidationProvider>
-        <div className="h-full flex flex-col bg-white/98 backdrop-blur-sm">
-          {/* Modern Header with Back Button */}
-          <div className="sticky top-0 z-50 bg-gradient-to-r from-smartflytt-600 to-smartflytt-700 text-white shadow-lg">
+        <div className="h-full flex flex-col glass glass-dark">
+          {/* Enhanced Header with glassmorphism */}
+          <div className="sticky top-0 z-50 bg-gradient-to-r from-smartflytt-600 via-smartflytt-700 to-indigo-600 text-white shadow-xl">
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                    <span className="text-2xl">{SMARTFLYTT_CONFIG.BOT.avatar}</span>
-                  </div>
+                  <BotAvatar 
+                    size="lg" 
+                    animated 
+                    className="bg-white/20 backdrop-blur-sm border border-white/30" 
+                  />
                   <div>
-                    <h1 className="text-xl font-bold">{SMARTFLYTT_CONFIG.BOT.name}</h1>
-                    <p className="text-smartflytt-100 text-sm">{SMARTFLYTT_CONFIG.COMPANY.tagline}</p>
+                    <h1 className="text-xl font-bold font-inter">
+                      {SMARTFLYTT_CONFIG.BOT.name}
+                    </h1>
+                    <p className="text-smartflytt-100 text-base font-medium">
+                      {SMARTFLYTT_CONFIG.COMPANY.tagline}
+                    </p>
                   </div>
                 </div>
                 
-                {/* Back Button */}
+                {/* Enhanced Back Button */}
                 {chatbotState.canGoBack() && (
                   <BackButton 
                     onGoBack={chatbotState.goBackOneStep}
                     disabled={chatbotState.state.isLoading}
-                    className="text-white hover:text-smartflytt-100 hover:bg-white/10"
+                    className="text-white hover:text-smartflytt-100 hover:bg-white/20 glass-button border-white/30"
                   />
                 )}
               </div>
