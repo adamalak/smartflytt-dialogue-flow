@@ -38,7 +38,7 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onLeadUpdated }) => {
       const { error } = await supabase
         .from('leads')
         .update({ status: newStatus })
-        .eq('id', leadId);
+        .eq('id', leadId) as any;
 
       if (error) {
         console.error('Error updating lead status:', error);

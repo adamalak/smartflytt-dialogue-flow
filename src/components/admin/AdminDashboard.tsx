@@ -33,7 +33,7 @@ const AdminDashboard: React.FC = () => {
       const { data, error } = await supabase
         .from('leads')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as any;
 
       if (error) {
         console.error('Error fetching leads:', error);

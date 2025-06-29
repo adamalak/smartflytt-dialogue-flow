@@ -54,11 +54,11 @@ export const submitForm = async (context: SubmissionContext) => {
         chat_transcript: JSON.parse(JSON.stringify(state.messages))
       };
 
-      const { data: leadResult, error: leadError } = await supabase
+      const { data: leadResult, error: leadError } = await (supabase
         .from('leads')
         .insert(leadData)
         .select()
-        .single();
+        .single() as any);
 
       if (leadError) {
         console.error('Lead save error:', leadError);
