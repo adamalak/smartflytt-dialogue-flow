@@ -68,7 +68,8 @@ export const calculatePrice = (input: PriceCalculationInput): PriceCalculation =
 };
 
 export const formatPriceBreakdown = (calculation: PriceCalculation): string => {
-  let breakdown = `Prisberäkning:\n`;
+  let breakdown = `💰 **PRELIMINÄR PRISBERÄKNING**\n\n`;
+  breakdown += `📋 Kostnadsuppdelning:\n`;
   breakdown += `• Startavgift: ${calculation.startFee} kr\n`;
   breakdown += `• Hissavgift: ${calculation.elevatorFee} kr\n`;
   breakdown += `• Volymkostnad: ${calculation.volumeCost} kr\n`;
@@ -82,7 +83,10 @@ export const formatPriceBreakdown = (calculation: PriceCalculation): string => {
     breakdown += `• Tillägg för lång flyttsträcka: ${calculation.longDistanceSurcharge} kr\n`;
   }
   
-  breakdown += `\n**Total preliminär kostnad: ${calculation.totalPrice} kr** (inkl. RUT-avdrag)`;
+  breakdown += `\n🔢 **Total preliminär kostnad: ${calculation.totalPrice} kr**\n`;
+  breakdown += `💡 *Inkluderar redan 50% RUT-avdrag*\n\n`;
+  breakdown += `⚠️ **VIKTIGT:** Detta är en preliminär beräkning som inte är bindande. `;
+  breakdown += `Slutlig offert bekräftas efter granskning av vårt team och eventuell besiktning.`;
   
   return breakdown;
 };

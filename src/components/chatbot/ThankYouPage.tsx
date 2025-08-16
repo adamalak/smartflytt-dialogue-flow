@@ -68,12 +68,22 @@ export const ThankYouPage: React.FC<ThankYouPageProps> = ({ formData, onStartOve
       <div className="flex justify-center p-6">
         <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-smartflytt-200 overflow-hidden">
           {/* Success Header */}
-          <div className="bg-gradient-to-br from-green-500 to-green-600 text-white p-8 text-center">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8" />
+          <div className="bg-gradient-to-br from-smartflytt-600 via-smartflytt-700 to-smartflytt-800 text-white p-8 text-center">
+            <div className="w-20 h-20 bg-white/20 backdrop-blur rounded-full flex items-center justify-center mx-auto mb-6 animate-scale-in">
+              <div className="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center">
+                <Check className="w-10 h-10 animate-bounce" />
+              </div>
             </div>
-            <h1 className="text-2xl font-bold mb-2">{getPersonalizedMessage()}</h1>
-            <p className="text-green-100">Vi kontaktar dig {getResponseTime()}</p>
+            <h1 className="text-3xl font-bold mb-3">{getPersonalizedMessage()}</h1>
+            <div className="space-y-2">
+              <p className="text-smartflytt-100 text-lg">
+                🎉 Din förfrågan har mottagits!
+              </p>
+              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur rounded-full px-4 py-2">
+                <Clock className="w-4 h-4" />
+                <span className="font-semibold">Vi bekräftar din offert inom 24 timmar</span>
+              </div>
+            </div>
           </div>
 
           {/* Content */}
@@ -130,22 +140,45 @@ export const ThankYouPage: React.FC<ThankYouPageProps> = ({ formData, onStartOve
             </div>
 
             {/* Next Steps */}
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-                <Clock className="w-5 h-5 mr-2 text-smartflytt-600" />
-                Vad händer nu?
-              </h3>
-              <div className="space-y-3">
-                {SMARTFLYTT_CONFIG.SUCCESS.nextSteps.map((step, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-smartflytt-100 rounded-full flex items-center justify-center mt-0.5">
-                      <span className="text-xs font-semibold text-smartflytt-600">{index + 1}</span>
-                    </div>
-                    <p className="text-gray-600 text-sm">{step}</p>
+            <Card className="rounded-2xl shadow-lg bg-gradient-to-br from-smartflytt-50 to-blue-50 border border-smartflytt-200">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-smartflytt-800 mb-6 flex items-center">
+                  <div className="w-8 h-8 bg-smartflytt-600 rounded-full flex items-center justify-center mr-3">
+                    <Clock className="w-4 h-4 text-white" />
                   </div>
-                ))}
-              </div>
-            </div>
+                  Nästa steg i processen
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-4 p-4 bg-white/80 rounded-xl border border-smartflytt-100">
+                    <div className="w-8 h-8 bg-smartflytt-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-bold text-white">1</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-smartflytt-800">Bekräftelse inom 24 timmar</h4>
+                      <p className="text-smartflytt-600 text-sm">Vi granskar din förfrågan och bekräftar offerten via e-post eller telefon</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-4 p-4 bg-white/80 rounded-xl border border-smartflytt-100">
+                    <div className="w-8 h-8 bg-smartflytt-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-bold text-white">2</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-smartflytt-800">Besiktning vid behov</h4>
+                      <p className="text-smartflytt-600 text-sm">För större flyttar bokar vi en kostnadsfri besiktning för exakt offert</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-4 p-4 bg-white/80 rounded-xl border border-smartflytt-100">
+                    <div className="w-8 h-8 bg-smartflytt-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-bold text-white">3</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-smartflytt-800">Bindande offert</h4>
+                      <p className="text-smartflytt-600 text-sm">Du får en slutgiltig, bindande offert med alla detaljer</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Trust Signals */}
             <div className="flex flex-wrap gap-2 justify-center">
