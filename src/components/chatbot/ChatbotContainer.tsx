@@ -7,6 +7,7 @@ import { ProgressIndicator } from './ProgressIndicator';
 import { OnboardingScreen } from './OnboardingScreen';
 import { BackButton } from './BackButton';
 import { BotAvatar } from './BotAvatar';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ValidationProvider } from '@/contexts/ValidationContext';
 import { trackFlowStep, trackFormAbandonment } from '@/utils/analytics';
 import { SMARTFLYTT_CONFIG } from '@/data/constants';
@@ -84,33 +85,37 @@ export const ChatbotContainer: React.FC = () => {
   return (
     <ErrorBoundary>
       <ValidationProvider>
-        <div className="h-full flex flex-col glass glass-dark">
-          {/* Enhanced Header with glassmorphism */}
-          <div className="sticky top-0 z-50 bg-gradient-to-r from-smartflytt-600 via-smartflytt-700 to-indigo-600 text-white shadow-xl">
-            <div className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <BotAvatar 
-                    size="lg" 
-                    animated 
-                    className="bg-white/20 backdrop-blur-sm border border-white/30" 
-                  />
-                  <div>
-                    <h1 className="text-xl font-bold font-inter">
-                      {SMARTFLYTT_CONFIG.BOT.name}
-                    </h1>
-                    <p className="text-smartflytt-100 text-base font-medium">
-                      {SMARTFLYTT_CONFIG.COMPANY.tagline}
-                    </p>
-                  </div>
+        <div className="h-full flex flex-col relative overflow-hidden"
+             style={{
+               background: 'linear-gradient(135deg, hsl(var(--smartflytt-50)) 0%, hsl(var(--background)) 50%, hsl(var(--smartflytt-50) / 0.3) 100%)'
+             }}>
+          {/* Animated background elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-smartflytt-200/10 dark:bg-smartflytt-800/10 rounded-full blur-3xl animate-float"></div>
+            <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-smartflytt-300/10 dark:bg-smartflytt-700/10 rounded-full blur-3xl animate-float [animation-delay:2s]"></div>
+          </div>
+          
+          {/* Header */}
+          <div className="glass-overlay border-b border-gradient p-6 relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <BotAvatar size="lg" className="shadow-glow" />
+                <div>
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-smartflytt-700 to-smartflytt-600 bg-clip-text text-transparent">
+                    {SMARTFLYTT_CONFIG.COMPANY.name}
+                  </h2>
+                  <p className="text-lg text-smartflytt-600 dark:text-smartflytt-400 font-medium">
+                    {SMARTFLYTT_CONFIG.COMPANY.tagline}
+                  </p>
                 </div>
-                
-                {/* Enhanced Back Button */}
+              </div>
+              <div className="flex items-center gap-3">
+                <ThemeToggle />
                 {chatbotState.canGoBack() && (
                   <BackButton 
                     onGoBack={chatbotState.goBackOneStep}
                     disabled={chatbotState.state.isLoading}
-                    className="text-white hover:text-smartflytt-100 hover:bg-white/20 glass-button border-white/30"
+                    className="glass-card hover:shadow-glow"
                   />
                 )}
               </div>
@@ -119,7 +124,7 @@ export const ChatbotContainer: React.FC = () => {
 
           <ProgressIndicator currentStep={chatbotState.state.currentStep} />
           
-          <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 flex flex-col min-h-0 relative z-10">
             <ChatMessages 
               messages={chatbotState.state.messages}
               isLoading={chatbotState.state.isLoading}

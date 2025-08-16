@@ -72,36 +72,44 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ currentSte
   }
 
   return (
-    <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-smartflytt-200/50 shadow-sm">
-      <div className="px-4 py-4">
-        {/* Step indicators */}
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-lg font-semibold text-smartflytt-700">
+    <div className="sticky top-0 z-50 glass-overlay border-b border-gradient shadow-elegant">
+      <div className="px-6 py-5">
+        {/* Step indicators with enhanced styling */}
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-lg font-bold text-smartflytt-700 dark:text-smartflytt-300 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-smartflytt-500 animate-pulse-glow"></div>
             Förlopp
           </span>
-          <span className="text-lg font-bold text-smartflytt-600">
-            {currentStepNumber}/{totalSteps - 1}
-          </span>
+          <div className="glass-card px-3 py-1 rounded-xl">
+            <span className="text-lg font-bold bg-gradient-to-r from-smartflytt-600 to-smartflytt-500 bg-clip-text text-transparent">
+              {currentStepNumber}/{totalSteps - 1}
+            </span>
+          </div>
         </div>
 
-        {/* Progress bar with glassmorphic styling */}
-        <div className="relative">
-          <Progress 
-            value={progressPercentage} 
-            className="h-3 bg-smartflytt-100 rounded-full overflow-hidden shadow-inner"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full pointer-events-none"></div>
+        {/* Enhanced progress bar */}
+        <div className="relative mb-4">
+          <div className="h-3 bg-smartflytt-100/30 dark:bg-smartflytt-900/30 rounded-full overflow-hidden backdrop-blur-sm">
+            <div 
+              className="h-full bg-gradient-to-r from-smartflytt-600 via-smartflytt-500 to-smartflytt-400 rounded-full transition-all duration-700 ease-out shadow-glow relative overflow-hidden"
+              style={{ width: `${progressPercentage}%` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-float"></div>
+            </div>
+          </div>
         </div>
 
-        {/* Current step description */}
-        <div className="mt-3 flex items-center justify-center">
-          <p className="text-sm font-medium text-smartflytt-600 text-center">
-            {getStepLabel(currentStep)}
-          </p>
+        {/* Current step with enhanced styling */}
+        <div className="mb-4 text-center">
+          <div className="glass-card inline-block px-4 py-2 rounded-2xl">
+            <p className="text-sm font-semibold text-smartflytt-700 dark:text-smartflytt-300">
+              {getStepLabel(currentStep)}
+            </p>
+          </div>
         </div>
 
-        {/* Step dots visualization */}
-        <div className="flex justify-center mt-2 space-x-2">
+        {/* Enhanced step dots */}
+        <div className="flex justify-center space-x-3">
           {stepOrder.slice(1, -1).map((step, index) => {
             const isCompleted = index < currentStepNumber;
             const isCurrent = index === currentStepNumber;
@@ -109,14 +117,18 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ currentSte
             return (
               <div
                 key={step}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                className={`relative transition-all duration-500 ${
                   isCompleted 
-                    ? 'bg-smartflytt-600 scale-110 shadow-sm' 
+                    ? 'w-3 h-3 bg-smartflytt-600 scale-110 shadow-glow rounded-full' 
                     : isCurrent 
-                    ? 'bg-smartflytt-400 scale-125 ring-2 ring-smartflytt-200' 
-                    : 'bg-smartflytt-200'
+                    ? 'w-4 h-4 bg-smartflytt-500 scale-125 rounded-full animate-pulse-glow ring-2 ring-smartflytt-300/50' 
+                    : 'w-2 h-2 bg-smartflytt-200 dark:bg-smartflytt-800 rounded-full hover:scale-110'
                 }`}
-              />
+              >
+                {isCompleted && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent rounded-full"></div>
+                )}
+              </div>
             );
           })}
         </div>
