@@ -2,7 +2,7 @@
 project_id = "syfkpifjsnsbdzculmos"
 
 [functions.send-email]
-verify_jwt = false
+verify_jwt = true
 
 [functions.calculate-distances]
-verify_jwt = false
+verify_jwt = true
