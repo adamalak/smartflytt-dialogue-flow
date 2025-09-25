@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartflytt.se/api/edge-calculate-distances.schema.json",
+  "title": "Calculate Distances Edge Function",
+  "description": "Schema for the calculate-distances edge function request and response",
+  "type": "object",
+  "definitions": {
+    "calculateDistancesRequest": {
+      "type": "object",
+      "properties": {
+        "fromAddress": {
+          "$ref": "#/definitions/address"
+        },
+        "toAddress": {
+          "$ref": "#/definitions/address"
+        }
+      },
+      "required": ["fromAddress", "toAddress"],
+      "additionalProperties": false
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Street address"
+        },
+        "postal": {
+          "type": "string",
+          "pattern": "^\\d{3}\\s?\\d{2}$",
+          "description": "Swedish postal code"
+        },
+        "city": {
+          "type": "string",
+          "minLength": 1,
+          "description": "City name"
+        }
+      },
+      "required": ["street", "postal", "city"],
+      "additionalProperties": false
+    },
+    "distanceData": {
+      "type": "object",
+      "properties": {
+        "movingDistance": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Distance between origin and destination in kilometers"
+        },
+        "baseToStartDistance": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Distance from company base to origin address in kilometers"
+        },
+        "baseToEndDistance": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Distance from company base to destination address in kilometers"
+        }
+      },
+      "required": ["movingDistance", "baseToStartDistance", "baseToEndDistance"],
+      "additionalProperties": false
+    },
+    "calculateDistancesResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Whether the calculation was successful"
+        },
+        "data": {
+          "$ref": "#/definitions/distanceData"
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message (if unsuccessful)"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique request identifier for tracing"
+        }
+      },
+      "required": ["success", "requestId"],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "request": {
+      "$ref": "#/definitions/calculateDistancesRequest"
+    },
+    "response": {
+      "$ref": "#/definitions/calculateDistancesResponse"
+    }
+  }
+}

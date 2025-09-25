@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { render, RenderOptions, RenderResult } from '@testing-library/react';
+import { render, RenderOptions, RenderResult, screen, waitFor } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { Toaster } from '@/components/ui/toaster';
@@ -130,10 +131,10 @@ export const mockChatbotData = {
 };
 
 // API response mocks
-export const createMockApiResponse = <T,>(
+export const createMockApiResponse = <T>(
   data: T,
-  options: Partial<MockApiResponse<T>> = {}
-): MockApiResponse<T> => ({
+  options: Partial<MockApiResponse> = {}
+): MockApiResponse & { data: T } => ({
   success: true,
   data,
   requestId: 'test-request-id',
@@ -145,17 +146,24 @@ export const createMockApiResponse = <T,>(
 export const createMockApiError = (
   message: string,
   status = 500
-): MockApiResponse<never> => ({
+): MockApiResponse => ({
   success: false,
   error: message,
   requestId: 'test-request-id',
   delay: 0,
   shouldFail: true,
-  ...{ status },
+  status,
 });
 
 // Supabase mock helpers
-export const mockSupabaseResponse = <T,>(data: T, error: any = null) => ({
+export const mockSupabaseResponse = <T>(data: T, error: any = null) => ({
+  data,
+  error,
+  status: error ? 400 : 200,
+  statusText: error ? 'Bad Request' : 'OK',
+});
+
+export const mockSupabaseAuthResponse = <T>(data: T, error: any = null) => ({
   data,
   error,
   status: error ? 400 : 200,
@@ -206,6 +214,8 @@ export const createTestContext = (
 
 // Accessibility testing helpers
 export const expectToBeAccessible = async (container: HTMLElement): Promise<void> => {
+  const { expect } = await import('vitest');
+  
   const buttons = container.querySelectorAll('button');
   buttons.forEach(button => {
     expect(button).toHaveAttribute('type');
@@ -247,3 +257,4 @@ export const measureRenderTime = async (
 export * from '@testing-library/react';
 export { customRender as render };
 export { userEvent } from '@testing-library/user-event';
+export { screen, waitFor };
