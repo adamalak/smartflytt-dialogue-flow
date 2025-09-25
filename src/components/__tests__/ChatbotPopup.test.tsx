@@ -4,9 +4,9 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { render } from '@/test/utils';
+import { render } from '@testing-library/react';
 import { screen, waitFor } from '@testing-library/dom';
-import { userEvent } from '@testing-library/user-event';
+import userEvent from '@testing-library/user-event';
 import { ChatbotPopup } from '../ChatbotPopup';
 
 // Mock the chatbot container
