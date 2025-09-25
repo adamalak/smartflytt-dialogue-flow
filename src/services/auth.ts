@@ -5,11 +5,9 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from './logger';
-import type { User, AuthSession, UserRole } from '@/types';
+import type { User, AuthUser, AuthSession, UserRole } from '@/types';
 
-export interface AuthUser extends User {
-  role: UserRole;
-}
+// AuthUser is now imported from types
 
 export interface LoginCredentials {
   email: string;
@@ -289,10 +287,10 @@ class AuthService {
       let createdAt = new Date().toISOString();
       let updatedAt = new Date().toISOString();
 
-      if (!error && data) {
+      if (!error && data && 'role' in data && 'created_at' in data && 'updated_at' in data) {
         userRole = data.role as UserRole;
-        createdAt = data.created_at;
-        updatedAt = data.updated_at;
+        createdAt = data.created_at as string;
+        updatedAt = data.updated_at as string;
       } else {
         // Fallback: Check if user email is admin email for initial setup
         const { data: { user } } = await supabase.auth.getUser();
@@ -359,6 +357,9 @@ class AuthService {
     return errorMap[errorMessage] || 'Ett fel uppstod vid inloggning';
   }
 }
+
+// Create singleton instance
+const authService = new AuthService();
 
 // Export individual functions and singleton instance
 export const signIn = (credentials: LoginCredentials) => authService.signIn(credentials);

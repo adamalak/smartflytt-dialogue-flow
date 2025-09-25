@@ -50,13 +50,36 @@ const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      await signIn(data.email, data.password);
-      logger.info('Admin login successful', { email: data.email, component: 'LoginPage' });
+      logger.info('Login attempt', { 
+        component: 'LoginPage',
+        metadata: { email: data.email }
+      });
+
+      const { user, error } = await signIn({ email: data.email, password: data.password });
+      
+      if (error) {
+        logger.error('Login error', { 
+          component: 'LoginPage',
+          error: new Error(error),
+          metadata: { email: data.email }
+        });
+        setError(error);
+        return;
+      }
+
+      logger.info('Admin login successful', { 
+        component: 'LoginPage',
+        metadata: { email: data.email }
+      });
       navigate('/admin');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Inloggning misslyckades';
       setError(errorMessage);
-      logger.error('Admin login failed', { error, email: data.email, component: 'LoginPage' });
+      logger.error('Login exception', { 
+        component: 'LoginPage',
+        error: error instanceof Error ? error : new Error(errorMessage),
+        metadata: { email: data.email }
+      });
     } finally {
       setIsSubmitting(false);
     }

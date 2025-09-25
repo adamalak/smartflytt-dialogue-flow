@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const refreshUser = async (): Promise<void> => {
     try {
       if (session?.user) {
-        const authUser = await getCurrentUser(session.user);
+        const authUser = await getCurrentUser();
         const adminStatus = await hasAdminRole(authUser);
         
         setUser(authUser);
@@ -74,7 +74,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        logger.debug('Auth state changed', { event, userId: session?.user?.id, component: 'AuthContext' });
+        logger.debug('Auth state changed', { 
+          component: 'AuthContext',
+          metadata: { event, userId: session?.user?.id }
+        });
         
         setSession(session);
         
@@ -82,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (session?.user) {
           setTimeout(async () => {
             try {
-              const authUser = await getCurrentUser(session.user);
+              const authUser = await getCurrentUser();
               const adminStatus = await hasAdminRole(authUser);
               
               setUser(authUser);

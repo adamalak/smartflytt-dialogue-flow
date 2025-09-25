@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { render, RenderOptions, RenderResult } from '@testing-library/react';
-import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -132,10 +131,10 @@ export const mockChatbotData = {
 };
 
 // API response mocks
-export const createMockApiResponse = <T,>(
+export const createMockApiResponse = <T = unknown>(
   data: T,
-  options: Partial<MockApiResponse> = {}
-): MockApiResponse & { data: T } => ({
+  options: Partial<MockApiResponse<T>> = {}
+): MockApiResponse<T> & { data: T } => ({
   success: true,
   data,
   requestId: 'test-request-id',
@@ -147,13 +146,12 @@ export const createMockApiResponse = <T,>(
 export const createMockApiError = (
   message: string,
   status = 500
-): MockApiResponse => ({
+): MockApiResponse<unknown> => ({
   success: false,
   error: message,
   requestId: 'test-request-id',
   delay: 0,
   shouldFail: true,
-  status,
 });
 
 // Supabase mock helpers
@@ -258,4 +256,3 @@ export const measureRenderTime = async (
 export * from '@testing-library/react';
 export { customRender as render };
 export { userEvent } from '@testing-library/user-event';
-export { screen, waitFor };

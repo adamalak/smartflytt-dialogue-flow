@@ -60,6 +60,10 @@ export interface User {
   updatedAt: Timestamp;
 }
 
+export interface AuthUser extends User {
+  role: UserRole;
+}
+
 export type UserRole = 'admin' | 'user';
 
 export interface AuthSession {
