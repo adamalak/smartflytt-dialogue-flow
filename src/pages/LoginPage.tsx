@@ -51,12 +51,12 @@ const LoginPage: React.FC = () => {
 
     try {
       await signIn(data.email, data.password);
-      logger.info('Admin login successful', { email: data.email });
+      logger.info('Admin login successful', { email: data.email, component: 'LoginPage' });
       navigate('/admin');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Inloggning misslyckades';
       setError(errorMessage);
-      logger.error('Admin login failed', { error, email: data.email });
+      logger.error('Admin login failed', { error, email: data.email, component: 'LoginPage' });
     } finally {
       setIsSubmitting(false);
     }

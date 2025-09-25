@@ -7,13 +7,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { logger } from './logger';
 import type { User, AuthSession, UserRole } from '@/types';
 
+export interface AuthUser extends User {
+  role: UserRole;
+}
+
 export interface LoginCredentials {
   email: string;
   password: string;
 }
 
 export interface AuthState {
-  user: User | null;
+  user: AuthUser | null;
   session: AuthSession | null;
   isLoading: boolean;
   error: string | null;
@@ -25,7 +29,7 @@ class AuthService {
   /**
    * Sign in with email and password
    */
-  async signIn(credentials: LoginCredentials): Promise<{ user: User | null; error: string | null }> {
+  async signIn(credentials: LoginCredentials): Promise<{ user: AuthUser | null; error: string | null }> {
     try {
       logger.info('Sign in attempt', { 
         component: 'AuthService',
@@ -135,7 +139,7 @@ class AuthService {
   /**
    * Get current authenticated user with role information
    */
-  async getCurrentUser(): Promise<User | null> {
+  async getCurrentUser(): Promise<AuthUser | null> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -158,14 +162,14 @@ class AuthService {
   /**
    * Check if user has admin role
    */
-  hasAdminRole(user: User | null): boolean {
+  hasAdminRole(user: AuthUser | null): boolean {
     return user?.role === this.ADMIN_ROLE;
   }
 
   /**
    * Set up auth state change listener
    */
-  onAuthStateChange(callback: (user: User | null) => void): () => void {
+  onAuthStateChange(callback: (user: AuthUser | null) => void): () => void {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         logger.debug('Auth state change', {
@@ -267,7 +271,7 @@ class AuthService {
    * Get user with role information from database
    * Fallback to mock admin role until user_roles table is created
    */
-  private async getUserWithRole(userId: string): Promise<User | null> {
+  private async getUserWithRole(userId: string): Promise<AuthUser | null> {
     try {
       // Try to get user role from database
       const { data, error } = await supabase
@@ -325,7 +329,7 @@ class AuthService {
         role: userRole,
         createdAt,
         updatedAt,
-      };
+      } as AuthUser;
 
     } catch (error) {
       logger.error('Get user with role failed', {
@@ -356,5 +360,11 @@ class AuthService {
   }
 }
 
-// Export singleton instance
-export const authService = new AuthService();
+// Export individual functions and singleton instance
+export const signIn = (credentials: LoginCredentials) => authService.signIn(credentials);
+export const signOut = () => authService.signOut();
+export const getCurrentUser = () => authService.getCurrentUser();
+export const hasAdminRole = (user: AuthUser | null) => authService.hasAdminRole(user);
+export const createAdminAccount = (email: string, password: string) => authService.createAdminAccount(email, password);
+
+export { authService };

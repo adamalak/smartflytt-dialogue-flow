@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { render, RenderOptions, RenderResult, screen, waitFor } from '@testing-library/react';
+import { render, RenderOptions, RenderResult } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -131,7 +132,7 @@ export const mockChatbotData = {
 };
 
 // API response mocks
-export const createMockApiResponse = <T>(
+export const createMockApiResponse = <T,>(
   data: T,
   options: Partial<MockApiResponse> = {}
 ): MockApiResponse & { data: T } => ({
@@ -156,14 +157,14 @@ export const createMockApiError = (
 });
 
 // Supabase mock helpers
-export const mockSupabaseResponse = <T>(data: T, error: any = null) => ({
+export const mockSupabaseResponse = <T,>(data: T, error: any = null) => ({
   data,
   error,
   status: error ? 400 : 200,
   statusText: error ? 'Bad Request' : 'OK',
 });
 
-export const mockSupabaseAuthResponse = <T>(data: T, error: any = null) => ({
+export const mockSupabaseAuthResponse = <T,>(data: T, error: any = null) => ({
   data,
   error,
   status: error ? 400 : 200,
